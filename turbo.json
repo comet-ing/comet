@@ -1,0 +1,22 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "globalEnv": [],
+    "pipeline": {
+        "build": {
+            "dependsOn": ["^build", "codegen"],
+            "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+        },
+        "clean": {
+            "cache": false
+        },
+        "codegen": {
+            "outputs": ["src/graphql/**", "src/contracts.ts"]
+        },
+        "dev": {
+            "dependsOn": ["codegen"],
+            "cache": false,
+            "persistent": true
+        },
+        "lint": {}
+    }
+}

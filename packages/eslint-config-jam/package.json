@@ -1,0 +1,14 @@
+{
+    "name": "eslint-config-jam",
+    "version": "0.0.0",
+    "main": "index.js",
+    "license": "Apache-2.0",
+    "private": true,
+    "dependencies": {
+        "eslint-config-next": "latest",
+        "eslint-config-prettier": "^9",
+        "eslint-plugin-react": "^7",
+        "eslint-config-turbo": "latest",
+        "typescript": "^5"
+    }
+}
