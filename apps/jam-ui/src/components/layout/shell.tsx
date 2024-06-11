@@ -11,6 +11,7 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
 import { FaHome, FaPencilAlt } from "react-icons/fa";
@@ -48,6 +49,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     <Group justify="space-between" style={{ flex: 1 }}>
                         <Link href="/">JAM TWT LOGO</Link>
                         <Group ml={{ lg: "xl" }}>
+                            <ConnectButton />
                             <Switch
                                 checked={colorScheme === "dark"}
                                 onChange={() => toggleColorScheme()}
