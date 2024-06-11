@@ -1,6 +1,10 @@
 {
     "$schema": "https://turbo.build/schema.json",
-    "globalEnv": [],
+    "globalEnv": [
+        "NEXT_PUBLIC_CHAIN_ID",
+        "NEXT_PUBLIC_ALCHEMY_API_KEY",
+        "NEXT_PUBLIC_ROLLUPS_ENDPOINT"
+    ],
     "pipeline": {
         "build": {
             "dependsOn": ["^build", "codegen"],
