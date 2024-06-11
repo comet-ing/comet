@@ -1,3 +1,5 @@
+//import { parseEther } from "viem"
+
 export default class Jam {
 
     static allJams = []
@@ -36,6 +38,7 @@ export default class Jam {
 
         if (this.entries.length >= this.maxEntries) {
         this.open = false;
+        // TODO - option to create a nft mint voucher when jam closes. con - node costs
         }
     }
 
@@ -46,4 +49,27 @@ export default class Jam {
         }
         jam.appendToJam(address, text);
       };
+    
+    static getJamByID = (jamID) => {
+      return Jam.allJams.find(jam => jam.id === jamID) || null;
+    };
+
+    static getJamsByStatus = (status) => {
+      if (status !== 'open' && status !== 'closed') {
+        throw new Error('Invalid status. Must be either "open" or "closed".');
+      }
+      if (status === 'open') {
+        return Jam.allJams.filter(jam => jam.open === true);
+      } else {
+        return Jam.allJams.filter(jam => jam.open === false);
+      }
+    };
+
+    static getJamsByCreator = (creatorAddress) => {
+      return Jam.allJams.filter(jam => jam.creatorAddress === creatorAddress);
+    };
+  
+    static getJamsByParticipant = (participantAddress) => {
+      return Jam.allJams.filter(jam => jam.creatorAddress !== participantAddress && jam.submittedAddresses.has(participantAddress));
+    };
 }
