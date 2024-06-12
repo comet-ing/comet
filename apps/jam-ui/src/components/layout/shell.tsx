@@ -35,7 +35,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     mobile: !opened,
                 },
             }}
-            padding="md"
+            padding={{ base: 10, sm: 15, lg: "xl" }}
         >
             <AppShell.Header data-testid="header">
                 <Group h="100%" px="md">

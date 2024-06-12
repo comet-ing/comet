@@ -1,6 +1,7 @@
-import { Stack, Title } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { Metadata } from "next";
 import { FaHandshake } from "react-icons/fa";
+import JamsView from "../../components/jams/JamsView";
 import PageTitle from "../../components/layout/pageTitle";
 
 export const metadata: Metadata = {
@@ -11,8 +12,7 @@ export default function JamsPage() {
     return (
         <Stack>
             <PageTitle title="Collaboration Space" Icon={FaHandshake} />
-            <Title order={4}>Create a JAM</Title>
-            <Title order={4}>List of latest n active JAMS goes here</Title>
+            <JamsView />
         </Stack>
     );
 }
