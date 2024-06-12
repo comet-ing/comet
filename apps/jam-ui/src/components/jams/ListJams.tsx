@@ -1,23 +1,17 @@
 "use client";
 
 import {
-    Alert,
     Avatar,
     Badge,
     Card,
-    Center,
     Group,
-    Loader,
     SimpleGrid,
-    Stack,
     Text,
     Title,
 } from "@mantine/core";
 import Link from "next/link";
 import { FC } from "react";
-import { FaExclamationCircle } from "react-icons/fa";
 import { CustomAvatar } from "./CustomAvatar";
-import { useListJams } from "./queries";
 import { Jam } from "./types";
 
 type ListProps = {
@@ -43,7 +37,7 @@ const CollabGroup: FC<CollabGroupProp> = ({ jam }) => {
     );
 };
 
-const List: FC<ListProps> = ({ jams }) => {
+export const ListJams: FC<ListProps> = ({ jams }) => {
     return (
         <SimpleGrid cols={{ xs: 1, md: 2 }}>
             {jams.map((jam, index) => (
@@ -62,7 +56,7 @@ const List: FC<ListProps> = ({ jams }) => {
                         </Group>
                     </Card.Section>
 
-                    <Text size="lg" mt="sm">
+                    <Text size="lg" mt="sm" lineClamp={4}>
                         {jam.description}
                     </Text>
                     <Card.Section px="md" mt="lg">
@@ -80,34 +74,5 @@ const List: FC<ListProps> = ({ jams }) => {
                 </Card>
             ))}
         </SimpleGrid>
-    );
-};
-
-export const ListJams: FC = () => {
-    const { data, error, isLoading } = useListJams();
-    const jams = data ?? [];
-
-    return (
-        <Stack justify="center">
-            {isLoading ? (
-                <Loader type="bars" />
-            ) : error ? (
-                <Alert
-                    variant="light"
-                    title="Alert title"
-                    icon={<FaExclamationCircle />}
-                >
-                    {error.message}
-                </Alert>
-            ) : jams.length ? (
-                <List jams={jams} />
-            ) : (
-                <Center>
-                    <Text fw={600} size="xl">
-                        Create the first JAM!
-                    </Text>
-                </Center>
-            )}
-        </Stack>
     );
 };

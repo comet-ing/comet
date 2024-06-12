@@ -6,7 +6,7 @@ import { Jam, JamListFilter } from "./types";
 
 const rollupHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
 
-const jamKeys = {
+export const jamKeys = {
     base: ["jams"] as const,
     lists: () => [...jamKeys.base, "list"] as const,
     list: (filter: JamListFilter) => [...jamKeys.lists(), filter] as const,

@@ -146,7 +146,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                         prepare={prepare}
                         execute={execute}
                         wait={wait}
-                        confirmationMessage="Raw input sent successfully!"
+                        confirmationMessage="JAM created successfully!"
                         defaultErrorMessage={execute.error?.message}
                     />
                 </Collapse>
