@@ -4,6 +4,7 @@ import {
     Group,
     NumberInput,
     Stack,
+    Text,
     TextInput,
     Textarea,
 } from "@mantine/core";
@@ -98,7 +99,8 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                     allowNegative={false}
                     label="Price"
                     description="Price to mint the work when completed."
-                    rightSection="ETH"
+                    rightSection={<Text>ETH</Text>}
+                    rightSectionWidth={60}
                     withAsterisk
                     {...form.getInputProps("mintPrice")}
                 />
