@@ -13,12 +13,14 @@ import { TransactionProgress } from "../TransactionProgress";
 
 export interface Props {
     onSuccess?: () => void;
+    jamId: number;
 }
 
-export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
+export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
     const form = useForm({
         validateInputOnChange: true,
         initialValues: {
+            jamID: jamId,
             entry: "",
         },
         validate: {

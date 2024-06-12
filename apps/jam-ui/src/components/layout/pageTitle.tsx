@@ -4,12 +4,13 @@ import { FC, JSX } from "react";
 interface PageTitleProps {
     title: string;
     Icon: JSX.ElementType;
+    iconSize?: number;
 }
 
-const PageTitle: FC<PageTitleProps> = ({ title, Icon }) => {
+const PageTitle: FC<PageTitleProps> = ({ title, Icon, iconSize }) => {
     return (
         <Group mb="sm" data-testid="page-title">
-            <Icon size={40} />
+            <Icon size={iconSize ?? 40} />
             <Title order={2}>{title}</Title>
         </Group>
     );

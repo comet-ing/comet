@@ -60,7 +60,11 @@ export default function JamsView() {
                         setFilter(value as JamListFilter);
                     }}
                 />
-                <Button variant="filled" onClick={openModal}>
+                <Button
+                    variant="filled"
+                    onClick={openModal}
+                    disabled={!isConnected}
+                >
                     CREATE JAM
                 </Button>
             </Group>

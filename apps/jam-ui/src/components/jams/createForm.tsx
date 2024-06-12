@@ -95,15 +95,17 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
 
                 <NumberInput
                     hideControls
-                    min={1}
+                    allowNegative={false}
                     label="Price"
                     description="Price to mint the work when completed."
+                    rightSection="ETH"
                     withAsterisk
                     {...form.getInputProps("mintPrice")}
                 />
 
                 <NumberInput
                     hideControls
+                    allowNegative={false}
                     min={1}
                     max={20}
                     label="Entries"

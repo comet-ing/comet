@@ -54,9 +54,39 @@ const fetchJams = async (filter: JamListFilter = "all") => {
     return result;
 };
 
+const fetchJamById = async (id: number) => {
+    if (id === undefined || id === null)
+        return createError("Can fetch jam without an id");
+
+    const url = `${rollupHost}/inspect/jams/${id}`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        return createError(`Network response error - ${response.status}`);
+    }
+
+    const data = (await response.json()) as InspectResponseBody;
+
+    if (data.status === "Exception")
+        return createError(hexToString(data.exception_payload));
+
+    const result = parseReport<Jam>(data.reports[0], null);
+    return result;
+};
+
+// HOOKS
+
 export const useListJams = (filter: JamListFilter = "all") => {
     return useQuery({
         queryKey: jamKeys.list(filter),
         queryFn: () => fetchJams(filter),
+    });
+};
+
+export const useFindJam = (id: number) => {
+    return useQuery({
+        queryKey: jamKeys.detail(id),
+        queryFn: () => fetchJamById(id),
     });
 };

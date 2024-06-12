@@ -56,7 +56,7 @@ export const ListJams: FC<ListProps> = ({ jams }) => {
                         </Group>
                     </Card.Section>
 
-                    <Text size="lg" mt="sm" lineClamp={4}>
+                    <Text size="lg" mt="sm" lineClamp={3}>
                         {jam.description}
                     </Text>
                     <Card.Section px="md" mt="lg">
