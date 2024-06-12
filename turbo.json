@@ -3,7 +3,8 @@
     "globalEnv": [
         "NEXT_PUBLIC_CHAIN_ID",
         "NEXT_PUBLIC_ALCHEMY_API_KEY",
-        "NEXT_PUBLIC_ROLLUPS_ENDPOINT"
+        "NEXT_PUBLIC_ROLLUPS_ENDPOINT",
+        "NEXT_PUBLIC_APP_ADDRESS"
     ],
     "pipeline": {
         "build": {

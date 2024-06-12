@@ -12,5 +12,10 @@ declare namespace NodeJS {
          * Rollups backend endpoint
          */
         NEXT_PUBLIC_ROLLUPS_ENDPOINT: string;
+
+        /**
+         * Contract address of the application on chain
+         */
+        NEXT_PUBLIC_APP_ADDRESS: string;
     }
 }

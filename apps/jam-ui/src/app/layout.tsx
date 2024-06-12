@@ -1,6 +1,7 @@
 import { ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
+import "@mantine/notifications/styles.css";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
