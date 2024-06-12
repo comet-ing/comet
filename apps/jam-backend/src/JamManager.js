@@ -1,4 +1,4 @@
-//import { parseEther } from "viem"
+import { parseEther } from "viem"
 
 export default class Jam {
 
@@ -72,4 +72,19 @@ export default class Jam {
     static getJamsByParticipant = (participantAddress) => {
       return Jam.allJams.filter(jam => jam.creatorAddress !== participantAddress && jam.submittedAddresses.has(participantAddress));
     };
+
+    static updateCreatorsBalance = async (jamID, fromAddress, wallet) => {
+      const jam = Jam.getJamByID(jamID);
+      const totalParticipants = jam.submittedAddresses.size;
+      const amountPerParticipant = parseEther(String(jam.mintPrice)) / BigInt(totalParticipants);
+      console.debug("Amount per participant: ", amountPerParticipant)
+      for (const toAddress of jam.submittedAddresses) {
+        try {
+          await wallet.transferEther(fromAddress, toAddress, amountPerParticipant);
+        } catch (error) {
+          console.error(`Failed to transfer to ${toAddress}:`, error);
+        }
+      }
+      console.debug("Balance updated successfully")
+    }
 }

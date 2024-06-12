@@ -4,6 +4,7 @@ import { hexToString, stringToHex, getAddress, slice, encodeFunctionData, parseE
 import Jam from './JamManager.js';
 import { createApp } from "@deroll/app";
 import { createWallet } from "@deroll/wallet";
+import nftContractAbi from "./SimpleERC1155ABI.json"
 
 // Create the application
 const app = createApp({
@@ -11,9 +12,10 @@ const app = createApp({
 });
 
 // Set smart contract addresses as per network
-ether_portal_address = getAddress("0xFfdbe43d4c855BF7e0f105c400A50857f53AB044") 
-nft_erc1155_address = ""
-dapp_treasury_address = "" 
+var ether_portal_address = getAddress("0xFfdbe43d4c855BF7e0f105c400A50857f53AB044") 
+var dapp_address_relay_contract = getAddress("0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE")
+var nft_erc1155_address = ""
+var dapp_treasury_address = "" 
 
 // Instantiate wallet for the rollup accounts
 const wallet = createWallet();
@@ -22,7 +24,7 @@ const wallet = createWallet();
 app.addAdvanceHandler(async ({ metadata, payload }) => {
   const sender = getAddress(metadata.msg_sender)
 
-  // asset handling
+  // ether deposit handling
   if (sender === ether_portal_address){
     console.log("Ether deposit request")
     try {
@@ -48,28 +50,33 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 
       if (minterEthBalance >= parseEther(String(jamToMint.mintPrice))){
         console.log("Eth balance is sufficient to mint.")
-        // TODO - create voucher to mint
-        // TODO - distribute eth to jam contributors
+        const callData = encodeFunctionData({
+          abi: nftContractAbi,
+          functionName: "mint",
+          args:[input_data[0], etherDepositExecJSON.jamID]
+        })
+        app.createVoucher({destination: nft_erc1155_address, payload: callData})
+        Jam.updateCreatorsBalance(etherDepositExecJSON.jamID, input_data[0], wallet)
       }
-      else{
+      else {
         console.log("Insufficient balance to mint. Deposit ether.")
       }
 
-      // prepare voucher
-      /*
-      const callData = encodeFunctionData({
-        abi: nftContractAbi,
-        functionName: "mintTo",
-        args:[input_data[0]]
-      })
-
-      // generate voucher
-      app.createVoucher({destination: nft_contract_address, payload: callData})
-    }
-    */
       return "accept" 
       }
     }
+
+  // Relay dApp address
+  if (sender === dapp_address_relay_contract){
+    console.log("Dapp Address relay request")
+    try {
+      await wallet.handler({ metadata, payload });
+    } catch (error) {
+      console.log("Error in relaying dapp address", error)
+      return "reject"
+    }
+    return "accept"
+  }
 
   // Jam Action handling
   var input = hexToString(payload)
@@ -78,6 +85,8 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 
   if (input.action === "jam.setNFTAddress"){
     // TODO - set nft address
+    nft_erc1155_address = getAddress(input.address)
+    console.log("NFT Contract address set as: ", nft_erc1155_address)
   }
   else if (input.action === "jam.create"){
     const newJam = new Jam(input.name, input.description, input.mintPrice, input.maxEntries, input.genesisEntry, sender)
