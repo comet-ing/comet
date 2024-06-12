@@ -6,12 +6,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract JamContract is ERC1155, Ownable {
 
-    constructor() ERC1155("") {} 
+    constructor() ERC1155("") { 
+   } 
 
-    function mint(address account, uint256 id, uint256 amount, bytes memory data)
+    function mint(address account, uint256 id)
         public
     { // This is our mint function to create new tokens and assign them to an ethereum address
-        _mint(account, id, amount, data);
+        _mint(account, id, 1, "");
     }
 
     function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)

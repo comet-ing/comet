@@ -42,9 +42,14 @@ Open Explorer to send this input. It's an EtherDeposit function with an arbitrar
 ```
 Note: You'll have to convert the above JSON to hex format before submitting.
 
+### Withdraw ether from the rollup application
+```
+{"action":"eth.withdraw", "amount":"2"}
+```
+
 ### Inpect eth balance inside the dapp
 ```
-http://localhost:8080/inspect/balance/0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+http://localhost:8080/inspect/balance/<input-address-here>
 ```
 
 ### Other inpect calls for Jams info
