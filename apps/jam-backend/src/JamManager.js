@@ -4,6 +4,7 @@ export default class Jam {
 
     static allJams = []
     static jamIDCounter = 0;
+    static jamStats = new Map();
 
     constructor(name, description, mintPrice, maxEntries, genesisEntry, contributor){
         this.id = Jam.jamIDCounter++;
@@ -16,6 +17,13 @@ export default class Jam {
         this.submittedAddresses = new Set([contributor]);
         this.open = true;
         Jam.allJams.push(this);
+
+        Jam.jamStats.set(this.id, {
+          name: this.name,
+          numTotalMints: 0,
+          totalMintAmount: String(0),
+          score: 0,
+        });
     }
 
     static showAllJams = () => {
@@ -36,9 +44,11 @@ export default class Jam {
         this.entries.push({ text, address });
         this.submittedAddresses.add(address);
 
+        // Update the overall jam score
+        Jam.updateJamScore(this);
+
         if (this.entries.length >= this.maxEntries) {
         this.open = false;
-        // TODO - option to create a nft mint voucher when jam closes. con - node costs
         }
     }
 
@@ -87,4 +97,55 @@ export default class Jam {
       }
       console.debug("Balance updated successfully")
     }
+
+    handleMintStats(mintAmount) {
+      const currentJamStat = Jam.jamStats.get(this.id);
+      if (currentJamStat) {
+        currentJamStat.numTotalMints += 1;
+        currentJamStat.totalMintAmount = String(BigInt(currentJamStat.totalMintAmount) + BigInt(mintAmount));
+        Jam.jamStats.set(this.id, currentJamStat);
+        Jam.updateJamScore(this);
+      }
+    }
+
+    static updateJamScore = (jam) => {
+      const currentJamStat = Jam.jamStats.get(jam.id);
+
+      const numCollaborators = jam.submittedAddresses.size;
+      const numTotalMints = currentJamStat ? currentJamStat.numTotalMints : 0;
+      const totalMintAmount = currentJamStat ? Number(BigInt(currentJamStat.totalMintAmount)) : 0;
+      
+      // hard-coded weights
+      const weightCollaborators = 0.2;
+      const weightTotalMints = 0.4;
+      const weightTotalMintAmount = 0.4;
+      
+      // hard-coded max values for normalisation
+      const maxCollaborators = 100; 
+      const maxTotalMints = 100;
+      const maxTotalMintAmount = 100; 
+      const scoreCollaborators = (numCollaborators / maxCollaborators) * 100;
+      const scoreTotalMints = (numTotalMints / maxTotalMints) * 100;
+      const scoreTotalMintAmount = (totalMintAmount / maxTotalMintAmount) * 100;
+  
+      const overallScore = 
+        (scoreCollaborators * weightCollaborators) +
+        (scoreTotalMints * weightTotalMints) +
+        (scoreTotalMintAmount * weightTotalMintAmount);
+      
+      // update jam stats
+      currentJamStat.score = Math.min(overallScore, 100);
+      Jam.jamStats.set(jam.id, currentJamStat);
+    }
+
+    static getJamStatsById = (jamID) => {
+      return Jam.jamStats.get(jamID)
+    }
+
+    static getAllJamsStats() {
+      return Array.from(Jam.jamStats.entries()).map(([jamID, info]) => {
+        return { jamID, ...info };
+      });
+    }
+
 }

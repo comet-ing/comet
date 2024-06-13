@@ -68,4 +68,7 @@ http://localhost:8080/inspect/jams
 
 // Get jams by user address
 http://localhost:8080/inspect/user/<input-address-here>
+
+// Get all jam statistics
+http://localhost:8080/inspect/jamstats
 ```

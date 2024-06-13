@@ -15,7 +15,6 @@ const app = createApp({
 var ether_portal_address = getAddress("0xFfdbe43d4c855BF7e0f105c400A50857f53AB044") 
 var dapp_address_relay_contract = getAddress("0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE")
 var nft_erc1155_address = ""
-var dapp_treasury_address = "" 
 
 // Instantiate wallet for the rollup accounts
 const wallet = createWallet();
@@ -53,14 +52,15 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
       const jamToMint = Jam.getJamByID(etherDepositExecJSON.jamID)
       console.log("Jam fetched: ", jamToMint)
       if (jamToMint === null){
-        app.createReport({ payload: stringToHex("No Jam found with given ID") })
+        app.createReport({ payload: stringToHex("Jam not found with given ID") })
         return "accept"
       }
       const minterEthBalance = wallet.etherBalanceOf(input_data[0])
+      const jamMintPrice = parseEther(String(jamToMint.mintPrice))
       console.log("Eth balance : ", minterEthBalance)
       console.log("Mint Price : ", jamToMint.mintPrice)
 
-      if (minterEthBalance >= parseEther(String(jamToMint.mintPrice))){
+      if (minterEthBalance >= jamMintPrice){
         console.log("Eth balance is sufficient to mint.")
         const callData = encodeFunctionData({
           abi: nftContractAbi,
@@ -69,9 +69,11 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
         })
         app.createVoucher({destination: nft_erc1155_address, payload: callData})
         Jam.updateCreatorsBalance(etherDepositExecJSON.jamID, input_data[0], wallet)
+        jamToMint.handleMintStats(jamMintPrice)
       }
       else {
         console.log("Insufficient balance to mint. Deposit ether.")
+        app.createReport({ payload: stringToHex("Insufficient balance to mint. Deposit ether.") })
       }
 
       return "accept" 
@@ -169,6 +171,11 @@ app.addInspectHandler(async ({ payload }) => {
     const eth_balance = wallet.etherBalanceOf(userAddress)
     console.log("eth balance:", eth_balance)
     await app.createReport({ payload: stringToHex(String(eth_balance)) });
+  }
+
+  if (payloadArr[0] === "jamstats") {
+    const allJamStats = Jam.getAllJamsStats()
+    app.createReport({ payload: stringToHex(JSON.stringify(allJamStats)) })
   }
 
   return "accept";
