@@ -6,8 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract JamContract is ERC1155, Ownable {
 
-    constructor() ERC1155("") { 
-   } 
+    constructor(address initialOwner) ERC1155("") Ownable(initialOwner){} 
 
     function mint(address account, uint256 id)
         public
