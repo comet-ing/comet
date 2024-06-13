@@ -16,9 +16,9 @@ import { useWaitForTransactionReceipt } from "wagmi";
 import {
     useSimulateInputBoxAddInput,
     useWriteInputBoxAddInput,
-} from "../../generated/wagmi-rollups";
-import { useApplicationAddress } from "../../hooks/useApplicationAddress";
-import { TransactionProgress } from "../TransactionProgress";
+} from "../../../generated/wagmi-rollups";
+import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
+import { TransactionProgress } from "../../TransactionProgress";
 
 export interface Props {
     onSuccess?: () => void;
@@ -59,7 +59,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
     const prepare = useSimulateInputBoxAddInput({
         args: [address, hexInput],
         query: {
-            enabled: form.isValid(),
+            enabled: address !== null && hexInput !== null,
         },
     });
 

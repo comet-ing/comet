@@ -2,14 +2,14 @@ import { Button, Collapse, Group, Stack, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { FC, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
-import { stringToHex } from "viem";
+import { Hex, stringToHex } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import {
     useSimulateInputBoxAddInput,
     useWriteInputBoxAddInput,
-} from "../../generated/wagmi-rollups";
-import { useApplicationAddress } from "../../hooks/useApplicationAddress";
-import { TransactionProgress } from "../TransactionProgress";
+} from "../../../generated/wagmi-rollups";
+import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
+import { TransactionProgress } from "../../TransactionProgress";
 
 export interface Props {
     onSuccess?: () => void;
@@ -29,14 +29,19 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
                     ? "Entry is required to contribute to this JAM"
                     : null,
         },
-        transformValues: (values) => ({
-            hexInput: stringToHex(
-                JSON.stringify({
-                    action: "jam.append",
-                    ...values,
-                }),
-            ),
-        }),
+        transformValues: (values) => {
+            let hexInput: Hex = "0x0";
+
+            if (values.entry !== "") {
+                hexInput = stringToHex(
+                    JSON.stringify({
+                        action: "jam.append",
+                        ...values,
+                    }),
+                );
+            }
+            return { hexInput };
+        },
     });
 
     const address = useApplicationAddress();
@@ -46,7 +51,7 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
     const prepare = useSimulateInputBoxAddInput({
         args: [address, hexInput],
         query: {
-            enabled: form.isValid(),
+            enabled: address !== null && hexInput !== "0x0",
         },
     });
 

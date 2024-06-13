@@ -23,7 +23,7 @@ import {
 } from "../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../hooks/useApplicationAddress";
 import { CustomAvatar } from "./CustomAvatar";
-import { ContributeJamForm } from "./contributeForm";
+import { ContributeJamForm } from "./forms/Contribute";
 import { jamKeys, useFindJam } from "./queries";
 
 type MintButtonProp = {
@@ -202,7 +202,11 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
                 </Card>
             ))}
 
-            <Modal opened={showform} onClose={closeModal} title="Create a JAM">
+            <Modal
+                opened={showform}
+                onClose={closeModal}
+                title="Create content"
+            >
                 <ContributeJamForm onSuccess={onSuccess} jamId={jamId} />
             </Modal>
         </Stack>

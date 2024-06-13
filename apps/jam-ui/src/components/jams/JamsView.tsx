@@ -9,6 +9,7 @@ import {
     SegmentedControl,
     Stack,
     Text,
+    Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -17,7 +18,7 @@ import { useCallback, useState } from "react";
 import { FaExclamationCircle } from "react-icons/fa";
 import { useAccount } from "wagmi";
 import { ListJams } from "./ListJams";
-import { CreateJamForm } from "./createForm";
+import { CreateJamForm } from "./forms/Create";
 import { jamKeys, useListJams } from "./queries";
 import { JamListFilter } from "./types";
 
@@ -60,13 +61,21 @@ export default function JamsView() {
                         setFilter(value as JamListFilter);
                     }}
                 />
-                <Button
-                    variant="filled"
-                    onClick={openModal}
-                    disabled={!isConnected}
+                <Tooltip
+                    disabled={isConnected}
+                    label="Connect to be able to create a JAM"
+                    withArrow
+                    multiline
+                    w={200}
                 >
-                    CREATE JAM
-                </Button>
+                    <Button
+                        variant="filled"
+                        onClick={openModal}
+                        disabled={!isConnected}
+                    >
+                        CREATE JAM
+                    </Button>
+                </Tooltip>
             </Group>
 
             {isLoading ? (
