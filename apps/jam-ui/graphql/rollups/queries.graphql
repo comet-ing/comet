@@ -1,0 +1,27 @@
+query getVouchers {
+    vouchers {
+        edges {
+            voucher: node {
+                index
+                input {
+                    index
+                }
+                destination
+                payload
+                proof {
+                    context
+                    validity {
+                        inputIndexWithinEpoch
+                        machineStateHash
+                        noticesEpochRootHash
+                        outputHashInOutputHashesSiblings
+                        outputHashesInEpochSiblings
+                        outputHashesRootHash
+                        outputIndexWithinInput
+                        vouchersEpochRootHash
+                    }
+                }
+            }
+        }
+    }
+}
