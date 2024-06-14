@@ -12,6 +12,7 @@
         "codegen:graphql": "graphql-codegen"
     },
     "dependencies": {
+        "@jam/frames": "*",
         "@mantine/core": "^7.10.1",
         "@mantine/form": "^7.10.1",
         "@mantine/hooks": "^7.10.1",
