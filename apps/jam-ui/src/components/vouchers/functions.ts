@@ -1,5 +1,11 @@
-import { Address, decodeFunctionData, isAddressEqual, parseAbi } from "viem";
-import { Voucher } from "./types";
+import {
+    Address,
+    decodeFunctionData,
+    isAddressEqual,
+    parseAbi,
+    zeroHash,
+} from "viem";
+import { Proof, Voucher } from "./types";
 
 const mintAbi = parseAbi(["function mint(address receiver, uint256 jamId)"]);
 
@@ -9,6 +15,20 @@ export const voucherExecutionAbi = parseAbi([
     "function wasVoucherExecuted(uint256 inputIndex, uint256 outputIndexWithinInput) external view returns (bool)",
     "function executeVoucher(address _destination, bytes calldata _payload, Proof calldata _proof) external returns (bool)",
 ]);
+
+export const dummyProof: Proof = {
+    context: "0x",
+    validity: {
+        inputIndexWithinEpoch: 0,
+        outputIndexWithinInput: 0,
+        outputHashesRootHash: zeroHash,
+        vouchersEpochRootHash: zeroHash,
+        noticesEpochRootHash: zeroHash,
+        machineStateHash: zeroHash,
+        outputHashInOutputHashesSiblings: [],
+        outputHashesInEpochSiblings: [],
+    },
+};
 
 export function decodeVoucher(voucher: Voucher) {
     const { args } = decodeFunctionData({
@@ -28,8 +48,12 @@ export function filterVouchersByReceiver(
     vouchers: Voucher[],
     account: Address,
 ) {
-    return vouchers.filter((voucher) => {
-        const { receiver } = decodeVoucher(voucher);
-        return isAddressEqual(receiver, account);
-    });
+    return vouchers.filter((voucher) =>
+        isVoucherOwnedByAccount(voucher, account),
+    );
+}
+
+export function isVoucherOwnedByAccount(voucher: Voucher, account: Address) {
+    const { receiver } = decodeVoucher(voucher);
+    return isAddressEqual(receiver, account);
 }

@@ -6,6 +6,7 @@ import {
     GetVouchersDocument,
     GetVouchersQueryVariables,
 } from "../../generated/graphql/rollups/operations";
+import { decodeVoucher, isVoucherOwnedByAccount } from "./functions";
 import { Voucher } from "./types";
 
 const rollupsHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
@@ -29,6 +30,18 @@ type VoucherQuery = {
     };
 };
 
+export type UserVoucher = {
+    type: "MINT" | "WITHDRAWAL";
+    voucher: Voucher;
+    jamId: string;
+    receiver: Address;
+};
+
+/**
+ *
+ * @param address
+ * @returns
+ */
 const fetchVouchers = async (address?: Address) => {
     if (!address) return null;
 
@@ -36,17 +49,24 @@ const fetchVouchers = async (address?: Address) => {
         graphqlURL,
         GetVouchersDocument,
     );
+
+    const edges = vouchers.edges ?? [];
+
+    const data: UserVoucher[] = edges
+        .filter((node) => isVoucherOwnedByAccount(node.voucher, address))
+        .map(({ voucher }) => {
+            const { value, receiver } = decodeVoucher(voucher);
+            return { voucher, jamId: value.toString(), receiver, type: "MINT" };
+        });
+
+    return data;
 };
 
 // HOOKS
 
-export const useListVouchers = (address?: Address) => {
+export const useGetUserVouchers = (address?: Address) => {
     return useQuery({
         queryKey: voucherKeys.list(address ?? zeroAddress),
-        queryFn: () =>
-            request<VoucherQuery, GetVouchersQueryVariables>(
-                graphqlURL,
-                GetVouchersDocument,
-            ),
+        queryFn: () => fetchVouchers(address),
     });
 };

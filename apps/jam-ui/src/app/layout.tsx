@@ -31,7 +31,7 @@ export default function RootLayout({
             <body className={inter.className}>
                 <Providers>
                     <>
-                        <Notifications />
+                        <Notifications position="top-right" zIndex={1000} />
                         <Shell>{children}</Shell>
                     </>
                 </Providers>

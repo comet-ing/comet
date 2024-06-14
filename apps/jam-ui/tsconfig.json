@@ -1,7 +1,12 @@
 {
     "extends": "@jam/tsconfig/nextjs.json",
     "compilerOptions": {
-        "plugins": [{ "name": "next" }]
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "resolveJsonModule": true
     },
     "include": [
         "src",

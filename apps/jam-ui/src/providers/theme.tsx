@@ -6,6 +6,7 @@ import {
     MantineThemeOverride,
     Modal,
     Paper,
+    Text,
     createTheme,
     mergeMantineTheme,
 } from "@mantine/core";
@@ -19,6 +20,11 @@ const themeOverride: MantineThemeOverride = createTheme({
         chainIconSize: 24,
     },
     components: {
+        Text: Text.extend({
+            defaultProps: {
+                style: { lineBreak: "anywhere" },
+            },
+        }),
         Modal: Modal.extend({
             defaultProps: {
                 size: "lg",

@@ -14,7 +14,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
-import { FaHome, FaPencilAlt } from "react-icons/fa";
+import { FaHome, FaPencilAlt, FaTags } from "react-icons/fa";
 import { TbMoonStars, TbSun } from "react-icons/tb";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
@@ -98,6 +98,15 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         onClick={toggleMobileMenu}
                         href="/jams"
                         leftSection={<FaPencilAlt />}
+                        data-testid="jams-link"
+                    />
+
+                    <NavLink
+                        component={Link}
+                        label="Collections"
+                        onClick={toggleMobileMenu}
+                        href="/collections"
+                        leftSection={<FaTags />}
                         data-testid="jams-link"
                     />
                 </Stack>
