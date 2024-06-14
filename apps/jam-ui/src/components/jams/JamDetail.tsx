@@ -1,6 +1,7 @@
 "use client";
 import {
     Alert,
+    Anchor,
     Button,
     Card,
     Center,
@@ -9,11 +10,13 @@ import {
     Modal,
     Stack,
     Text,
+    Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useQueryClient } from "@tanstack/react-query";
-import { FC, useCallback } from "react";
+import Link from "next/link";
+import { FC, useCallback, useEffect } from "react";
 import { FaCheck, FaInfoCircle } from "react-icons/fa";
 import { parseUnits, stringToHex } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
@@ -22,6 +25,7 @@ import {
     useWriteEtherPortalDepositEther,
 } from "../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../hooks/useApplicationAddress";
+import { CenteredErrorMessage } from "../CenteredErrorMessage";
 import { CustomAvatar } from "./CustomAvatar";
 import { ContributeJamForm } from "./forms/Contribute";
 import { jamKeys, useFindJam } from "./queries";
@@ -58,6 +62,24 @@ const MintButton: FC<MintButtonProp> = ({ jamId, price }) => {
     const canSubmit = !prepare.isLoading && prepare.error === null;
     const loading = execute.isPending || wait.isLoading;
 
+    useEffect(() => {
+        if (wait.isSuccess) {
+            execute.reset();
+            notifications.show({
+                autoClose: false,
+                title: <Title order={4}>Nice!</Title>,
+                message: (
+                    <Group>
+                        <Text>Request for mint confirmed</Text>
+                        <Anchor component={Link} href="/collections">
+                            Check your collections
+                        </Anchor>
+                    </Group>
+                ),
+            });
+        }
+    }, [execute, wait.isSuccess]);
+
     return (
         <Button
             variant="filled"
@@ -68,21 +90,6 @@ const MintButton: FC<MintButtonProp> = ({ jamId, price }) => {
         >
             Mint ({price} ETH)
         </Button>
-    );
-};
-
-type ErrorProps = {
-    message: string;
-};
-const Error: FC<ErrorProps> = ({ message }) => {
-    return (
-        <Stack>
-            <Center>
-                <Alert variant="light" color="red" icon={<FaInfoCircle />}>
-                    {message}
-                </Alert>
-            </Center>
-        </Stack>
     );
 };
 
@@ -123,12 +130,12 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
         );
 
     if (error) {
-        return <Error message={error.message} />;
+        return <CenteredErrorMessage message={error.message} />;
     }
 
     if (!data)
         return (
-            <Error
+            <CenteredErrorMessage
                 message={`There is no JAM with id ${jamId}! Check the list of existing JAMS.`}
             />
         );

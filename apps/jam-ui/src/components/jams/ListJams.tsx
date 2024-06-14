@@ -56,10 +56,12 @@ export const ListJams: FC<ListProps> = ({ jams }) => {
                         </Group>
                     </Card.Section>
 
-                    <Text size="lg" mt="sm" lineClamp={3}>
-                        {jam.description}
-                    </Text>
-                    <Card.Section px="md" mt="lg">
+                    <Card.Section inheritPadding mih="5rem" py="md">
+                        <Text size="lg" lineClamp={3}>
+                            {jam.description}
+                        </Text>
+                    </Card.Section>
+                    <Card.Section mt="lg" inheritPadding>
                         <Group justify="space-between">
                             <CollabGroup jam={jam} />
                             <Group>
@@ -67,7 +69,6 @@ export const ListJams: FC<ListProps> = ({ jams }) => {
                                     Entries{" "}
                                     {`${jam.entries.length}/${jam.maxEntries}`}
                                 </Text>
-                                <Text></Text>
                             </Group>
                         </Group>
                     </Card.Section>
