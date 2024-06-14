@@ -14,7 +14,7 @@ cartesi build
 ```
 3. Turn up the node
 ```
-cartesi run --epoch-period=10
+cartesi run --epoch-duration=10
 ```
 4. Deploy ERC1155 smart contract - Open [Remix IDE](https://remix.ethereum.org/) and copy `contracts/SimpleERC1155.sol` file to Remix project. Compile, select environment as `Injected Provider - Metamask` and hit deploy. Copy the deployed contract address.
 

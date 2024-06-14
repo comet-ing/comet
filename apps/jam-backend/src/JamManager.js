@@ -1,4 +1,4 @@
-import { parseEther } from "viem"
+import { formatEther, parseEther } from "viem"
 
 export default class Jam {
 
@@ -21,8 +21,8 @@ export default class Jam {
         Jam.jamStats.set(this.id, {
           name: this.name,
           numTotalMints: 0,
-          totalMintAmount: String(0),
-          score: 0,
+          totalMintAmount: "0",
+          score: "0",
         });
     }
 
@@ -102,7 +102,7 @@ export default class Jam {
       const currentJamStat = Jam.jamStats.get(this.id);
       if (currentJamStat) {
         currentJamStat.numTotalMints += 1;
-        currentJamStat.totalMintAmount = String(BigInt(currentJamStat.totalMintAmount) + BigInt(mintAmount));
+        currentJamStat.totalMintAmount = String(formatEther(BigInt(parseEther(currentJamStat.totalMintAmount)) + BigInt(mintAmount)));
         Jam.jamStats.set(this.id, currentJamStat);
         Jam.updateJamScore(this);
       }
@@ -110,10 +110,10 @@ export default class Jam {
 
     static updateJamScore = (jam) => {
       const currentJamStat = Jam.jamStats.get(jam.id);
-
+      console.log("JamStat fetched to update score: ", currentJamStat)
       const numCollaborators = jam.submittedAddresses.size;
       const numTotalMints = currentJamStat ? currentJamStat.numTotalMints : 0;
-      const totalMintAmount = currentJamStat ? Number(BigInt(currentJamStat.totalMintAmount)) : 0;
+      const totalMintAmount = currentJamStat ? Number(currentJamStat.totalMintAmount) : 0;
       
       // hard-coded weights
       const weightCollaborators = 0.2;
@@ -134,7 +134,7 @@ export default class Jam {
         (scoreTotalMintAmount * weightTotalMintAmount);
       
       // update jam stats
-      currentJamStat.score = Math.min(overallScore, 100);
+      currentJamStat.score = Math.min(overallScore, 100).toFixed(2);
       Jam.jamStats.set(jam.id, currentJamStat);
     }
 

@@ -21,6 +21,7 @@ const wallet = createWallet();
 
 // Main advance request handler
 app.addAdvanceHandler(async ({ metadata, payload }) => {
+  console.log("Advance Request")
   const sender = getAddress(metadata.msg_sender)
 
   // ether deposit handling
@@ -33,10 +34,11 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
       console.log("Error in eth deposit", error)
       return "reject"
     }
+
     let input_data = [] 
     input_data[0] = getAddress(slice(payload, 0, 20))
     input_data[1] = slice(payload, 20, 52)
-    console.log("payload length: ", payload.length)
+
     if (payload.length > 53*2) {
       // ether deposit with execution payload
       input_data[2] = slice(payload, 52);
@@ -47,7 +49,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
     console.debug("input data is", input_data);   
     var etherDepositExecJSON = JSON.parse(hexToString(input_data[2]))
 
-    if (etherDepositExecJSON.action === "jam.mint"){
+    if (etherDepositExecJSON.action === "jam.mint" && nft_erc1155_address){
       console.log("Processing mint request for jam : #", etherDepositExecJSON.jamID)
       const jamToMint = Jam.getJamByID(etherDepositExecJSON.jamID)
       console.log("Jam fetched: ", jamToMint)
@@ -94,24 +96,23 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 
   // Jam Action handling
   var input = hexToString(payload)
-  console.log("Advance payload : ", input)
+  console.log("Payload : ", input)
   input = JSON.parse(input)
 
   if (input.action === "jam.setNFTAddress"){
-    // TODO - set nft address
     nft_erc1155_address = getAddress(input.address)
     console.log("NFT Contract address set as: ", nft_erc1155_address)
   }
   else if (input.action === "jam.create"){
     const newJam = new Jam(input.name, input.description, input.mintPrice, input.maxEntries, input.genesisEntry, sender)
-    //Jam.showAllJams();
     console.log("New Jam created: ", newJam)
   }
   else if (input.action === "jam.append"){
     Jam.appendToJamByID(input.jamID, sender, input.entry)
+    console.log("Appended to JamID: ", input.jamID)
   }
   else if (input.action === "eth.withdraw"){
-    console.log("Request: Withdraw ether")
+    console.log("Withdraw ether")
     const amountToWithdraw = parseEther(String(input.amount))
     try {
       const voucher = wallet.withdrawEther(sender, amountToWithdraw)
@@ -130,8 +131,9 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 });
 
 app.addInspectHandler(async ({ payload }) => {
+  console.log("Inspect Request")
   payload = hexToString(payload);
-  console.log("Received inspect request payload : ", payload);
+  console.log("Payload : ", payload);
   const payloadArr = payload.split("/");
 
   if (payloadArr[0] === "alljams") {
