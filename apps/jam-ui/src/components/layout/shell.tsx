@@ -11,11 +11,11 @@ import {
     useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
 import { FaHome, FaPencilAlt, FaTags } from "react-icons/fa";
 import { TbMoonStars, TbSun } from "react-icons/tb";
+import { ActionMenu } from "../ActionMenu";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle: toggleMobileMenu, close: closeMobileMenu }] =
@@ -50,7 +50,8 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     <Group justify="space-between" style={{ flex: 1 }}>
                         <Link href="/">JAM TWT LOGO</Link>
                         <Group ml={{ lg: "xl" }}>
-                            <ConnectButton />
+                            <ActionMenu />
+                            {/* <ConnectButton /> */}
                             <Switch
                                 checked={colorScheme === "dark"}
                                 onChange={() => toggleColorScheme()}

@@ -7,7 +7,7 @@ import {
     GetVouchersQueryVariables,
 } from "../../generated/graphql/rollups/operations";
 import { decodeVoucher, isVoucherOwnedByAccount } from "./functions";
-import { Voucher } from "./types";
+import { Voucher, VoucherType } from "./types";
 
 const rollupsHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
 const graphqlURL = `${rollupsHost}/graphql`;
@@ -31,9 +31,9 @@ type VoucherQuery = {
 };
 
 export type UserVoucher = {
-    type: "MINT" | "WITHDRAWAL";
+    type: VoucherType;
     voucher: Voucher;
-    jamId: string;
+    value: string;
     receiver: Address;
 };
 
@@ -55,8 +55,8 @@ const fetchVouchers = async (address?: Address) => {
     const data: UserVoucher[] = edges
         .filter((node) => isVoucherOwnedByAccount(node.voucher, address))
         .map(({ voucher }) => {
-            const { value, receiver } = decodeVoucher(voucher);
-            return { voucher, jamId: value.toString(), receiver, type: "MINT" };
+            const { value, receiver, type } = decodeVoucher(voucher);
+            return { voucher, value: value.toString(), receiver, type };
         });
 
     return data;

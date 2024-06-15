@@ -1,5 +1,7 @@
 import { Address, Hash, Hex } from "viem";
 
+export type VoucherType = "MINT" | "WITHDRAW";
+
 export interface Validity {
     inputIndexWithinEpoch: number;
     outputIndexWithinInput: number;

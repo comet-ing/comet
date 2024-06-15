@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FC, useEffect } from "react";
+import { formatEther } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
     useReadCartesiDAppWasVoucherExecuted,
@@ -109,6 +110,28 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
     );
 };
 
+interface Props {
+    userVoucher: UserVoucher;
+}
+
+const MintVoucher: FC<Props> = ({ userVoucher }) => {
+    return (
+        <Group justify="center">
+            <Text>Mint for Jam {userVoucher.value}</Text>
+            <ExecuteButton voucher={userVoucher.voucher} />
+        </Group>
+    );
+};
+
+const WithdrawVoucher: FC<Props> = ({ userVoucher }) => {
+    return (
+        <Group justify="center">
+            <Text>Withdraw {formatEther(BigInt(userVoucher.value))}</Text>
+            <ExecuteButton voucher={userVoucher.voucher} />
+        </Group>
+    );
+};
+
 const Info: FC<{ userVoucher: UserVoucher }> = ({ userVoucher }) => {
     return (
         <Box
@@ -117,15 +140,13 @@ const Info: FC<{ userVoucher: UserVoucher }> = ({ userVoucher }) => {
             p="sm"
             mt="xs"
         >
-            <Group justify="center">
-                <Text component="span">
-                    <Text tt="capitalize" component="span">
-                        {userVoucher.type.toLowerCase()}
-                    </Text>{" "}
-                    for Jam {userVoucher.jamId}
-                </Text>
-                <ExecuteButton voucher={userVoucher.voucher} />
-            </Group>
+            {userVoucher.type === "MINT" ? (
+                <MintVoucher userVoucher={userVoucher} />
+            ) : userVoucher.type === "WITHDRAW" ? (
+                <WithdrawVoucher userVoucher={userVoucher} />
+            ) : (
+                ""
+            )}
         </Box>
     );
 };
