@@ -145,7 +145,7 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
         (entry) => entry.address === address,
     );
 
-    const canContribute = isConnected && !isContributor;
+    const canContribute = isConnected && !isContributor && data.open;
 
     return (
         <Stack>

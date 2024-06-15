@@ -1,5 +1,7 @@
+"use client";
 import { Button, Collapse, Group, Stack, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
 import { Hex, stringToHex } from "viem";
@@ -10,6 +12,7 @@ import {
 } from "../../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
 import { TransactionProgress } from "../../TransactionProgress";
+import { transactionState } from "../../TransactionState";
 
 export interface Props {
     onSuccess?: () => void;
@@ -60,8 +63,15 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
         hash: execute.data,
     });
 
-    const loading = execute.isPending || wait.isLoading;
-    const canSubmit = form.isValid() && prepare.error === null;
+    const { disabled: appendDisabled, loading: appendLoading } =
+        transactionState(prepare, execute, wait, true);
+
+    const loading = execute.isPending || wait.isLoading || appendLoading;
+    const canSubmit =
+        form.isValid() && prepare.error === null && !appendDisabled;
+
+    const [debouncedLoading] = useDebouncedValue(loading, 500);
+    const [debouncedCanSubmit] = useDebouncedValue(canSubmit, 500);
 
     useEffect(() => {
         if (wait.isSuccess) {
@@ -108,9 +118,9 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
                 <Group justify="right">
                     <Button
                         variant="filled"
-                        disabled={!canSubmit}
+                        disabled={!debouncedCanSubmit}
                         leftSection={<FaCheck />}
-                        loading={loading}
+                        loading={debouncedLoading}
                         onClick={() =>
                             execute.writeContract(prepare.data!.request)
                         }

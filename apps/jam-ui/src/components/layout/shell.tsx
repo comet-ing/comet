@@ -18,7 +18,8 @@ import { FaHome, FaPencilAlt, FaTags } from "react-icons/fa";
 import { TbMoonStars, TbSun } from "react-icons/tb";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
-    const [opened, { toggle: toggleMobileMenu }] = useDisclosure();
+    const [opened, { toggle: toggleMobileMenu, close: closeMobileMenu }] =
+        useDisclosure();
     const theme = useMantineTheme();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme({
         keepTransitions: true,
@@ -88,14 +89,14 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         label="Home"
                         href="/"
                         leftSection={<FaHome />}
-                        onClick={toggleMobileMenu}
+                        onClick={closeMobileMenu}
                         data-testid="home-link"
                     />
 
                     <NavLink
                         component={Link}
                         label="Jams"
-                        onClick={toggleMobileMenu}
+                        onClick={closeMobileMenu}
                         href="/jams"
                         leftSection={<FaPencilAlt />}
                         data-testid="jams-link"
@@ -104,7 +105,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                     <NavLink
                         component={Link}
                         label="Collections"
-                        onClick={toggleMobileMenu}
+                        onClick={closeMobileMenu}
                         href="/collections"
                         leftSection={<FaTags />}
                         data-testid="jams-link"

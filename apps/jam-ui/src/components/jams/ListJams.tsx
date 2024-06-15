@@ -39,7 +39,7 @@ const CollabGroup: FC<CollabGroupProp> = ({ jam }) => {
 
 export const ListJams: FC<ListProps> = ({ jams }) => {
     return (
-        <SimpleGrid cols={{ xs: 1, md: 2 }}>
+        <SimpleGrid cols={{ base: 1, md: 2 }}>
             {jams.map((jam, index) => (
                 <Card
                     key={index}

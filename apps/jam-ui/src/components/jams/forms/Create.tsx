@@ -1,3 +1,4 @@
+"use client";
 import {
     Button,
     Collapse,
@@ -9,6 +10,7 @@ import {
     Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
 import { stringToHex } from "viem";
@@ -19,6 +21,7 @@ import {
 } from "../../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
 import { TransactionProgress } from "../../TransactionProgress";
+import { transactionState } from "../../TransactionState";
 
 export interface Props {
     onSuccess?: () => void;
@@ -43,6 +46,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                     : null,
         },
         transformValues: (values) => ({
+            genesisEntry: values.genesisEntry,
             hexInput: stringToHex(
                 JSON.stringify({
                     action: "jam.create",
@@ -68,8 +72,15 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
         hash: execute.data,
     });
 
-    const loading = execute.isPending || wait.isLoading;
-    const canSubmit = form.isValid() && prepare.error === null;
+    const { disabled: createDisabled, loading: createLoading } =
+        transactionState(prepare, execute, wait, true);
+
+    const loading = execute.isPending || wait.isLoading || createLoading;
+    const canSubmit =
+        form.isValid() && prepare.error === null && !createDisabled;
+
+    const [debouncedLoading] = useDebouncedValue(loading, 500);
+    const [debouncedCanSubmit] = useDebouncedValue(canSubmit, 500);
 
     useEffect(() => {
         if (wait.isSuccess) {
@@ -158,9 +169,9 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                 <Group justify="right">
                     <Button
                         variant="filled"
-                        disabled={!canSubmit}
+                        disabled={!debouncedCanSubmit}
                         leftSection={<FaCheck />}
-                        loading={loading}
+                        loading={debouncedLoading}
                         onClick={() =>
                             execute.writeContract(prepare.data!.request)
                         }

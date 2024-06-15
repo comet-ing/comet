@@ -134,7 +134,7 @@ interface VoucherListProps {
 }
 const VoucherList: FC<VoucherListProps> = ({ userVouchers }) => {
     return (
-        <SimpleGrid cols={2}>
+        <SimpleGrid cols={{ base: 1, md: 2 }}>
             <Card withBorder>
                 <Center>
                     <Text size="xl">Your vouchers</Text>
