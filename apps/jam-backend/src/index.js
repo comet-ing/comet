@@ -80,7 +80,12 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 
       return "accept" 
       }
-    }
+      else{
+        console.log("Please set NFT address before you mint.")
+        app.createReport({ payload: stringToHex("NFT address not set") })
+        return "accept"
+      }
+  }
 
   // Relay dApp address
   if (sender === dapp_address_relay_contract){
@@ -114,6 +119,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
   else if (input.action === "eth.withdraw"){
     console.log("Withdraw ether")
     const amountToWithdraw = BigInt(input.amount)
+    console.log("Amount to withdraw : ", amountToWithdraw)
     try {
       const voucher = wallet.withdrawEther(sender, amountToWithdraw)
       await app.createVoucher(voucher)
