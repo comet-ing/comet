@@ -43,8 +43,9 @@ Open Explorer to send this input. It's an EtherDeposit function with an arbitrar
 Note: You'll have to convert the above JSON to hex format before submitting.
 
 ### Withdraw ether from the rollup application
+Accepts ether amount in wei format 
 ```
-{"action":"eth.withdraw", "amount":"2"}
+{"action":"eth.withdraw", "amount":"2000000000000000000"}
 ```
 
 ### Inpect eth balance inside the dapp
