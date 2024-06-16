@@ -55,13 +55,17 @@ export const WithdrawBalanceForm: FC<Props> = ({ onSuccess, balance }) => {
         },
         transformValues: (values) => {
             let hexInput: Hex = "0x0";
-            const payload = {
-                action: "eth.withdraw",
-                amount: values.amount,
-            };
 
             if (values.amount !== "") {
-                hexInput = stringToHex(JSON.stringify(payload));
+                hexInput = stringToHex(
+                    JSON.stringify({
+                        action: "eth.withdraw",
+                        amount: parseUnits(
+                            values.amount.toString(),
+                            values.decimals,
+                        ).toString(),
+                    }),
+                );
             }
             return { hexInput };
         },
