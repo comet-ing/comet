@@ -98,7 +98,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
             <Stack>
                 <TextInput
                     label="Name"
-                    description="The name of your JAM."
+                    description="The name of your Comet."
                     placeholder="My majestic journey through life"
                     withAsterisk
                     {...form.getInputProps("name")}
@@ -144,7 +144,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                     maxRows={5}
                     resize="vertical"
                     label="Genesis entry"
-                    description="The first content of the collaboration jam."
+                    description="The first content of the collaboration."
                     withAsterisk
                     {...form.getInputProps("genesisEntry")}
                 />
@@ -161,7 +161,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                         prepare={prepare}
                         execute={execute}
                         wait={wait}
-                        confirmationMessage="JAM created successfully!"
+                        confirmationMessage="Comet created successfully!"
                         defaultErrorMessage={execute.error?.message}
                     />
                 </Collapse>

@@ -48,7 +48,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         size="sm"
                     />
                     <Group justify="space-between" style={{ flex: 1 }}>
-                        <Link href="/">JAM TWT LOGO</Link>
+                        <Link href="/">Comet TWT LOGO</Link>
                         <Group ml={{ lg: "xl" }}>
                             <ActionMenu />
                             {/* <ConnectButton /> */}
@@ -96,7 +96,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
 
                     <NavLink
                         component={Link}
-                        label="Jams"
+                        label="Comets"
                         onClick={closeMobileMenu}
                         href="/jams"
                         leftSection={<FaPencilAlt />}

@@ -117,7 +117,7 @@ interface Props {
 const MintVoucher: FC<Props> = ({ userVoucher }) => {
     return (
         <Group justify="center">
-            <Text>Mint for Jam {userVoucher.value}</Text>
+            <Text>Mint for Comet {userVoucher.value}</Text>
             <ExecuteButton voucher={userVoucher.voucher} />
         </Group>
     );

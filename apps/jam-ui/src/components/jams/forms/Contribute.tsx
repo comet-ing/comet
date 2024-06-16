@@ -29,7 +29,7 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
         validate: {
             entry: (value) =>
                 value === ""
-                    ? "Entry is required to contribute to this JAM"
+                    ? "Entry is required to contribute to this Comet"
                     : null,
         },
         transformValues: (values) => {
@@ -93,7 +93,7 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
                     maxRows={5}
                     resize="vertical"
                     label="Entry"
-                    description="Contribute to the JAM content."
+                    description="Contribute to the Comet content."
                     withAsterisk
                     {...form.getInputProps("entry")}
                 />

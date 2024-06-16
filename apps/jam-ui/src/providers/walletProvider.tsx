@@ -35,7 +35,7 @@ const chain =
 const projectId = "37a6d6f11d78a12ca814a377a53b5b55";
 
 const connectorsForWalletsParameters = {
-    appName: "Jam TWT",
+    appName: "Cometing",
     projectId,
 };
 

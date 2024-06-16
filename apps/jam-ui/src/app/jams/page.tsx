@@ -5,7 +5,7 @@ import JamsView from "../../components/jams/JamsView";
 import PageTitle from "../../components/layout/pageTitle";
 
 export const metadata: Metadata = {
-    title: "Jams",
+    title: "Cometing - Comets",
 };
 
 export default function JamsPage() {
