@@ -17,5 +17,16 @@ declare namespace NodeJS {
          * Contract address of the application on chain
          */
         NEXT_PUBLIC_APP_ADDRESS: string;
+
+        /**
+         * Host/domain of the web application to be used when interacting with
+         * Warpcast frames
+         */
+        WEB_APP_BASE_URL: string;
+
+        /**
+         * Neynar service API KIT
+         */
+        NEYNAR_ONCHAIN_KIT_API_KEY: string;
     }
 }

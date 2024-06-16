@@ -1,17 +1,21 @@
-import { Stack } from "@mantine/core";
-import { FaRegLightbulb } from "react-icons/fa";
-import PageTitle from "../components/layout/pageTitle";
 import { prepareDonateFrameMetadata } from "@jam/frames";
+import { Group, Stack, Title } from "@mantine/core";
 import type { Metadata } from "next";
+import { FaChartSimple } from "react-icons/fa6";
 
 export const metadata: Metadata = prepareDonateFrameMetadata({
-    endpointBaseUrl: "https://jam-twt-jam-ui.vercel.app",
+    endpointBaseUrl: process.env.WEB_APP_BASE_URL,
 });
 
 export default function HomePage() {
     return (
         <Stack>
-            <PageTitle title="Jam House" Icon={FaRegLightbulb} />
+            <Group mb="sm" align="center">
+                <FaChartSimple size={40} />
+                <Title order={2} style={{ alignSelf: "end" }}>
+                    Comet Stats
+                </Title>
+            </Group>
         </Stack>
     );
 }
