@@ -10,11 +10,22 @@ import {
     createTheme,
     mergeMantineTheme,
 } from "@mantine/core";
+import { blueViolet, downy, haiti, kidnapper } from "./colors";
 
 const themeOverride: MantineThemeOverride = createTheme({
     cursorType: "pointer",
     fontFamily: "Open Sans, sans-serif",
-    primaryColor: "cyan",
+    primaryColor: "haiti",
+    colors: {
+        haiti,
+        blueViolet,
+        downy,
+        kidnapper,
+    },
+    primaryShade: {
+        dark: 5,
+        light: 7,
+    },
     other: {
         iconSize: 21,
         chainIconSize: 24,
@@ -63,6 +74,7 @@ const themeOverride: MantineThemeOverride = createTheme({
         Paper: Paper.extend({
             defaultProps: {
                 shadow: "xs",
+                withBorder: true,
             },
         }),
     },

@@ -116,15 +116,20 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
     const scheme = useMantineColorScheme();
 
     // XXX: make this match the mantine theme
-    const themeOptions: ThemeOptions = {
-        accentColor: "rgb(12, 133, 153)",
+    const themeOptionsLight: ThemeOptions = {
+        accentColor: "rgb(71,52,171)",
+        borderRadius: "small",
+    };
+
+    const themeOptionsDark: ThemeOptions = {
+        accentColor: "rgb(97,77,196)",
         borderRadius: "small",
     };
 
     const walletTheme =
         scheme.colorScheme == "dark"
-            ? darkTheme(themeOptions)
-            : lightTheme(themeOptions);
+            ? darkTheme(themeOptionsDark)
+            : lightTheme(themeOptionsLight);
 
     return (
         <WagmiProvider config={wagmiConfig}>
