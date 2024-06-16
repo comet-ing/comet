@@ -1,11 +1,13 @@
 "use client";
 import {
+    Anchor,
     AppShell,
     Burger,
     Group,
     NavLink,
     Stack,
     Switch,
+    Text,
     VisuallyHidden,
     useMantineColorScheme,
     useMantineTheme,
@@ -16,6 +18,7 @@ import { FC, ReactNode } from "react";
 import { FaHome, FaPencilAlt, FaTags } from "react-icons/fa";
 import { TbMoonStars, TbSun } from "react-icons/tb";
 import { ActionMenu } from "../ActionMenu";
+import CometLogo from "../CometLogo";
 
 const Shell: FC<{ children: ReactNode }> = ({ children }) => {
     const [opened, { toggle: toggleMobileMenu, close: closeMobileMenu }] =
@@ -38,9 +41,10 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             }}
             padding={{ base: 10, sm: 15, lg: "xl" }}
         >
-            <AppShell.Header data-testid="header">
+            <AppShell.Header data-testid="header" bg="haiti.9">
                 <Group h="100%" px="md">
                     <Burger
+                        color="white"
                         data-testid="burger-menu-btn"
                         opened={opened}
                         onClick={toggleMobileMenu}
@@ -48,7 +52,21 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         size="sm"
                     />
                     <Group justify="space-between" style={{ flex: 1 }}>
-                        <Link href="/">Comet TWT LOGO</Link>
+                        <Anchor component={Link} href="/" underline="never">
+                            <Group gap={0}>
+                                <CometLogo height={54} />
+                                <Text
+                                    mt="0.4rem"
+                                    component="span"
+                                    c="white"
+                                    size="xl"
+                                    fw="bold"
+                                >
+                                    COMET
+                                </Text>
+                            </Group>
+                        </Anchor>
+                        {/* <Link href="/"></Link> */}
                         <Group ml={{ lg: "xl" }}>
                             <ActionMenu />
                             {/* <ConnectButton /> */}

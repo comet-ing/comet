@@ -51,10 +51,11 @@ export default function JamsView() {
         <Stack>
             <Group justify="space-between">
                 <SegmentedControl
+                    color="haiti"
                     data={[
                         { label: "All", value: "all" },
-                        { label: "Open", value: "open" },
-                        { label: "Closed", value: "closed" },
+                        { label: "Join", value: "open" },
+                        { label: "Mint", value: "closed" },
                     ]}
                     value={filter}
                     onChange={(value) => {

@@ -23,8 +23,8 @@ const themeOverride: MantineThemeOverride = createTheme({
         kidnapper,
     },
     primaryShade: {
-        dark: 5,
-        light: 7,
+        dark: 4,
+        light: 5,
     },
     other: {
         iconSize: 21,

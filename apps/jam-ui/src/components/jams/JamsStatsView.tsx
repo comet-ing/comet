@@ -1,14 +1,14 @@
 "use client";
 import {
+    Card,
     Center,
-    Group,
     NumberFormatter,
     Paper,
     SimpleGrid,
     Stack,
     Text,
     Title,
-    useMantineTheme,
+    useMantineColorScheme,
 } from "@mantine/core";
 import { FC } from "react";
 import { CenteredErrorMessage } from "../CenteredErrorMessage";
@@ -18,7 +18,8 @@ import { useListJamsStats } from "./queries";
 
 export const JamsStatsView: FC = () => {
     const { data, isLoading, error } = useListJamsStats();
-    const theme = useMantineTheme();
+    const { colorScheme } = useMantineColorScheme();
+    const cardTitleColor = colorScheme === "light" ? "white" : "";
 
     if (isLoading) {
         return <CenteredLoaderBars />;
@@ -46,42 +47,55 @@ export const JamsStatsView: FC = () => {
             </Center>
         );
 
-    console.log(data);
-
     return (
         <SimpleGrid cols={{ base: 1, md: 2 }}>
             {data.map((stats) => (
-                <Paper key={stats.jamID} p="xl">
+                <Paper key={stats.jamID} p="xl" bg="haiti" radius="lg">
                     <Stack>
-                        <Title order={3}>{stats.name}</Title>
+                        <Title order={3} c={cardTitleColor}>
+                            {stats.name}
+                        </Title>
 
-                        <Group justify="space-between">
-                            <Stack align="center">
-                                <Text c="dimmed">Score</Text>
-                                <Text variant="gradient">{stats.score}</Text>
-                            </Stack>
+                        <SimpleGrid cols={{ base: 1, md: 2, xl: 3 }}>
+                            <Stats title="Score" value={stats.score} />
 
-                            <Stack align="center">
-                                <Text c="dimmed">Mints</Text>
-                                <Text variant="gradient">
-                                    {stats.numTotalMints}
-                                </Text>
-                            </Stack>
+                            <Stats
+                                title="Mints"
+                                value={stats.numTotalMints.toString()}
+                            />
 
-                            <Stack align="center">
-                                <Text c="dimmed">Total Minted</Text>
-                                <Text variant="gradient">
-                                    <NumberFormatter
-                                        suffix=" ETH"
-                                        value={stats.totalMintAmount}
-                                        thousandSeparator
-                                    />
-                                </Text>
-                            </Stack>
-                        </Group>
+                            <Stats
+                                title="Total Minted"
+                                value={stats.totalMintAmount}
+                                suffix=" ETH"
+                            />
+                        </SimpleGrid>
                     </Stack>
                 </Paper>
             ))}
         </SimpleGrid>
+    );
+};
+
+const Stats: FC<{
+    title: string;
+    value: string;
+    suffix?: string;
+    prefix?: string;
+}> = ({ title, value, suffix, prefix }) => {
+    return (
+        <Card radius="lg">
+            <Stack align="center">
+                <Text fw="500">{title}</Text>
+                <Text>
+                    <NumberFormatter
+                        suffix={suffix}
+                        prefix={prefix}
+                        value={value}
+                        thousandSeparator
+                    />
+                </Text>
+            </Stack>
+        </Card>
     );
 };

@@ -50,8 +50,8 @@ export const ListJams: FC<ListProps> = ({ jams }) => {
                     <Card.Section inheritPadding withBorder py="xs">
                         <Group justify="space-between">
                             <Title order={3}>{jam.name}</Title>
-                            <Badge color={jam.open ? "green" : "red"}>
-                                {jam.open ? "Open" : "Finalized"}
+                            <Badge color={jam.open ? "haiti" : "kidnapper"}>
+                                {jam.open ? "Join" : "Mint"}
                             </Badge>
                         </Group>
                     </Card.Section>

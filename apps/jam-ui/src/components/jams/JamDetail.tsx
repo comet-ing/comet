@@ -151,7 +151,7 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
         <Stack>
             {isClosed && (
                 <Alert variant="light" color="blue" icon={<FaInfoCircle />}>
-                    This JAM is closed for contributions.
+                    This comet is not accepting any new cometing.
                 </Alert>
             )}
 
@@ -168,13 +168,13 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
 
             {!isClosed && !isConnected && (
                 <Alert variant="light" color="blue" icon={<FaInfoCircle />}>
-                    Connect your wallet to contribute to this JAM!
+                    Connect your wallet to add to this Comet!
                 </Alert>
             )}
 
             {!isClosed && isContributor && (
                 <Alert variant="light" color="blue" icon={<FaInfoCircle />}>
-                    You already contributed!
+                    You already comet-ed!
                 </Alert>
             )}
 
@@ -184,7 +184,7 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
                     onClick={openModal}
                     disabled={!canContribute}
                 >
-                    Contribute
+                    COMETING
                 </Button>
                 {isClosed && (
                     <MintButton price={data.mintPrice} jamId={data.id} />
