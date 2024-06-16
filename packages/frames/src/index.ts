@@ -1,43 +1,111 @@
-import { getFrameMetadata } from "@coinbase/onchainkit/frame";
+import {
+    getFrameMessage,
+    getFrameMetadata,
+    FrameTransactionResponse,
+    getFrameHtmlResponse,
+} from "@coinbase/onchainkit/frame";
 
-export interface PrepareMetadataOpts {
-    url: string;
-    jamId: string;
+export interface PrepareDonateFrameMetadataOpts {
+    endpointBaseUrl: string;
 }
 
-export const prepareFrameMetadata = <T>({ url }: PrepareMetadataOpts) => {
+export const prepareDonateFrameMetadata = <T>({
+    endpointBaseUrl,
+}: PrepareDonateFrameMetadataOpts) => {
     const frameMetadata = getFrameMetadata({
         buttons: [
             {
-                label: "Story time",
+                action: "tx",
+                label: "Donate 0.00004 sepoliaETH",
+                target: `${endpointBaseUrl}/api/donate/prepare`,
+                postUrl: `${endpointBaseUrl}/api/donate/handletx`,
             },
             {
-                action: "tx",
-                label: "Send Base Sepolia",
-                target: `${url}/api/tx`,
-                postUrl: `${url}/api/tx-success`,
+                action: "link",
+                label: "Learn more",
+                target: endpointBaseUrl,
             },
         ],
         image: {
-            src: `${url}/park-3.png`,
+            src: "https://pbs.twimg.com/profile_images/1801339115935268864/myUfQhBo_400x400.jpg",
             aspectRatio: "1:1",
         },
-        input: {
-            text: "Tell me a story",
-        },
-        postUrl: `${url}/api/frame`,
     });
 
     return {
-        title: "zizzamia.xyz",
-        description: "LFG",
+        title: "Comet",
+        description: "Text co-creation platform",
         openGraph: {
-            title: "zizzamia.xyz",
-            description: "LFG",
-            images: [`${url}/park-1.png`],
+            title: "Comet",
+            description: "Text co-creation platform",
+            images: [
+                "https://pbs.twimg.com/profile_images/1801339115935268864/myUfQhBo_400x400.jpg",
+            ],
         },
         other: {
             ...frameMetadata,
         },
     } as T;
+};
+
+// ===============
+
+export interface PrepareFrameMessageOpts {
+    req: any;
+    apiKey: string;
+}
+
+export const prepareFrameMessage = async <T>({
+    req,
+    apiKey,
+}: PrepareFrameMessageOpts) => {
+    if (apiKey === "") {
+        return getFrameMessage(req) as T;
+    } else {
+        return getFrameMessage(req, {
+            neynarApiKey: apiKey,
+        }) as T;
+    }
+};
+
+// =============================
+
+export interface FrameTransactionResponseOpts {
+    chainId: string;
+    data: string;
+    toAddress: string;
+    ethValue: string;
+}
+
+export const prepareFrameTransactionResponse = ({
+    chainId,
+    data,
+    toAddress,
+    ethValue,
+}: FrameTransactionResponseOpts) => {
+    return {
+        chainId,
+        method: "eth_sendTransaction",
+        params: {
+            abi: [],
+            data,
+            to: toAddress,
+            value: ethValue, // TODO Is it needed?
+        },
+    } as FrameTransactionResponse;
+};
+
+// =============================
+
+export const prepareFrameHTMLResponse = (body: any) => {
+    return getFrameHtmlResponse({
+        buttons: [
+            {
+                label: `Tx: ${body?.untrustedData?.transactionId || "--"}`,
+            },
+        ],
+        image: {
+            src: "https://egs-group.in/wp-content/uploads/2017/02/payment-successful.png",
+        },
+    });
 };
