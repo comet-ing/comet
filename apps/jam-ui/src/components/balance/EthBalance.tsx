@@ -12,6 +12,7 @@ import { notifications } from "@mantine/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { FC, useCallback } from "react";
+import { FaEthereum } from "react-icons/fa";
 import { formatEther } from "viem";
 import { useAccount } from "wagmi";
 import { WithdrawBalanceForm } from "./WithdrawBalanceForm";
@@ -59,7 +60,11 @@ export const EthBalance: FC = () => {
                 <Text>{formatEther(data)} </Text>
             </Group>
 
-            {hasBalance && <Button onClick={openModal}>Withdraw</Button>}
+            {hasBalance && (
+                <Button onClick={openModal} rightSection={<FaEthereum />}>
+                    Withdraw
+                </Button>
+            )}
             <Modal
                 opened={showform}
                 onClose={closeModal}
