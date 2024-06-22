@@ -23,7 +23,7 @@ const HomeView = () => {
     const textColor = "#DCEAD3";
 
     return (
-        <Container fluid h="100%" m={0} p={0} bg={color}>
+        <Container fluid h="100%" m={0} p={0}>
             <Stack h="100%" justify="center" align="center">
                 <Box pl="xl" component="div" id="logo-box">
                     <CometLogo height={300} color={color} />
@@ -67,7 +67,7 @@ const HomeView = () => {
                         </Anchor>
                     </Group>
                 </Stack>
-                <Group>
+                <Group py="lg">
                     <Anchor
                         href="https://x.com/comet_ing"
                         target="_blank"
