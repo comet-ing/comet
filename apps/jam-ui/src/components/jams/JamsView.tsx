@@ -1,6 +1,5 @@
 "use client";
 import {
-    Alert,
     Button,
     Center,
     Group,
@@ -15,8 +14,9 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { FaExclamationCircle, FaMeteor } from "react-icons/fa";
+import { FaMeteor } from "react-icons/fa";
 import { useAccount } from "wagmi";
+import { CometAlert } from "../CometAlert";
 import { ListJams } from "./ListJams";
 import { CreateJamForm } from "./forms/Create";
 import { jamKeys, useListJams } from "./queries";
@@ -46,6 +46,8 @@ export default function JamsView() {
 
     const { data, error, isLoading } = useListJams(filter);
     const jams = data ?? [];
+
+    if (error) console.log(error.message);
 
     return (
         <Stack>
@@ -85,13 +87,7 @@ export default function JamsView() {
                     <Loader type="bars" />
                 </Center>
             ) : error ? (
-                <Alert
-                    variant="light"
-                    title="Alert title"
-                    icon={<FaExclamationCircle />}
-                >
-                    {error.message}
-                </Alert>
+                <CometAlert message="We are having trouble finding the Comets at the moment." />
             ) : jams.length ? (
                 <ListJams jams={jams} />
             ) : (

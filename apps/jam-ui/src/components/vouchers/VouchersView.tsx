@@ -20,9 +20,8 @@ import {
     useWriteCartesiDAppExecuteVoucher,
 } from "../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../hooks/useApplicationAddress";
-import { CenteredErrorMessage } from "../CenteredErrorMessage";
 import { CenteredLoaderBars } from "../CenteredLoaderBars";
-import { InfoMessage } from "../InfoMessage";
+import { CometAlert } from "../CometAlert";
 import { dummyProof } from "./functions";
 import { UserVoucher, useGetUserVouchers } from "./queries";
 import { Voucher } from "./types";
@@ -172,12 +171,14 @@ export const VouchersView: FC = () => {
     const { address, isConnected } = useAccount();
     const { data, isLoading, error } = useGetUserVouchers(address);
 
+    if (error) console.log(error.message);
+
     if (!isConnected) {
         return (
             <Center>
-                <InfoMessage
-                    title="Not connected"
-                    message={"Connect to check your collections"}
+                <CometAlert
+                    title="Not connected!"
+                    message="Connect to check your collections"
                 />
             </Center>
         );
@@ -188,21 +189,27 @@ export const VouchersView: FC = () => {
     }
 
     if (error) {
-        return <CenteredErrorMessage message={error.message} />;
+        return (
+            <Center>
+                <CometAlert message="We're not able to get your collections at the moment." />
+            </Center>
+        );
     }
 
     if (!data) {
         return (
-            <CenteredErrorMessage message="There are no vouchers to be presented" />
+            <Center>
+                <CometAlert message="There are no vouchers to be presented" />
+            </Center>
         );
     }
 
     if (data.length === 0) {
         return (
             <Center>
-                <InfoMessage
-                    title="No vouchers"
-                    message={`Could not find vouchers for account ${address}`}
+                <CometAlert
+                    title="No Vouchers!"
+                    message={`We could not find vouchers for account ${address}`}
                 />
             </Center>
         );

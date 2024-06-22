@@ -25,7 +25,7 @@ import {
     useWriteEtherPortalDepositEther,
 } from "../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../hooks/useApplicationAddress";
-import { CenteredErrorMessage } from "../CenteredErrorMessage";
+import { CometAlert } from "../CometAlert";
 import { CustomAvatar } from "./CustomAvatar";
 import { ContributeJamForm } from "./forms/Contribute";
 import { jamKeys, useFindJam } from "./queries";
@@ -130,14 +130,20 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
         );
 
     if (error) {
-        return <CenteredErrorMessage message={error.message} />;
+        return (
+            <Center>
+                <CometAlert message="We're having difficulty in finding this comet details." />
+            </Center>
+        );
     }
 
     if (!data)
         return (
-            <CenteredErrorMessage
-                message={`There is no JAM with id ${jamId}! Check the list of existing JAMS.`}
-            />
+            <Center>
+                <CometAlert
+                    message={`There is no Comet with id ${jamId}! Check the list of existing Comets.`}
+                />
+            </Center>
         );
 
     const isClosed = !data.open;

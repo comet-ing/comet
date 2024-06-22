@@ -11,9 +11,8 @@ import {
     useMantineColorScheme,
 } from "@mantine/core";
 import { FC } from "react";
-import { CenteredErrorMessage } from "../CenteredErrorMessage";
 import { CenteredLoaderBars } from "../CenteredLoaderBars";
-import { InfoMessage } from "../InfoMessage";
+import { CometAlert } from "../CometAlert";
 import { useListJamsStats } from "./queries";
 
 export const JamsStatsView: FC = () => {
@@ -21,26 +20,30 @@ export const JamsStatsView: FC = () => {
     const { colorScheme } = useMantineColorScheme();
     const cardTitleColor = colorScheme === "light" ? "white" : "";
 
+    if (error) console.log(error.message);
+
     if (isLoading) {
         return <CenteredLoaderBars />;
     }
 
-    if (error) return <CenteredErrorMessage message={error.message} />;
+    if (error)
+        return (
+            <Center>
+                <CometAlert message="We are having troubles fetching the Comet stats at the moment." />
+            </Center>
+        );
 
     if (!data)
         return (
             <Center>
-                <InfoMessage
-                    title="Humm!"
-                    message="Something is floating in the space. Check us later!"
-                />
+                <CometAlert message="Something is floating in space. Check us later!" />
             </Center>
         );
 
     if (data.length === 0)
         return (
             <Center>
-                <InfoMessage
+                <CometAlert
                     title="Where are the comets?"
                     message="Be the first to create a Comet!"
                 />

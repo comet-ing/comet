@@ -1,6 +1,5 @@
-import { Alert } from "@mantine/core";
 import { FC, ReactNode } from "react";
-import { FaInfoCircle } from "react-icons/fa";
+import { CometAlert } from "./CometAlert";
 
 type Props = {
     title?: string;
@@ -8,7 +7,5 @@ type Props = {
 };
 
 export const InfoMessage: FC<Props> = ({ message, title }) => (
-    <Alert variant="light" color="blue" icon={<FaInfoCircle />} title={title}>
-        {message}
-    </Alert>
+    <CometAlert color="blue" message={message} title={title} />
 );

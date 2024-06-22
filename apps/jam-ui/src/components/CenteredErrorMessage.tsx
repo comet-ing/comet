@@ -1,6 +1,6 @@
-import { Alert, Center } from "@mantine/core";
+import { Center } from "@mantine/core";
 import { FC } from "react";
-import { FaInfoCircle } from "react-icons/fa";
+import { CometAlert } from "./CometAlert";
 
 type ErrorProps = {
     message: string;
@@ -9,9 +9,7 @@ type ErrorProps = {
 export const CenteredErrorMessage: FC<ErrorProps> = ({ message }) => {
     return (
         <Center>
-            <Alert variant="light" color="red" icon={<FaInfoCircle />}>
-                {message}
-            </Alert>
+            <CometAlert color="red" message={message} />
         </Center>
     );
 };
