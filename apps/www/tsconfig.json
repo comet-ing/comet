@@ -1,0 +1,22 @@
+{
+    "extends": "@jam/tsconfig/nextjs.json",
+    "compilerOptions": {
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "resolveJsonModule": true
+    },
+    "include": [
+        "src",
+        "additional.d.ts",
+        "mantine.d.ts",
+        "next-env.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        ".next/types/**/*.ts",
+        "postcss.config.cjs"
+    ],
+    "exclude": ["node_modules"]
+}
