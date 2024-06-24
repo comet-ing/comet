@@ -16,21 +16,13 @@ import Image from "next/image";
 import { ReactNode } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { createConfig, fallback, http, WagmiProvider } from "wagmi";
-import {
-    foundry,
-    mainnet,
-    optimism,
-    optimismSepolia,
-    sepolia,
-} from "wagmi/chains";
+import { base, baseSepolia, foundry } from "wagmi/chains";
 
 // select chain based on env var
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");
 const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 const chain =
-    [foundry, mainnet, sepolia, optimism, optimismSepolia].find(
-        (c) => c.id == chainId,
-    ) || foundry;
+    [foundry, base, baseSepolia].find((c) => c.id == chainId) || foundry;
 
 const projectId = "37a6d6f11d78a12ca814a377a53b5b55";
 
@@ -43,7 +35,7 @@ const { wallets } = getDefaultWallets(connectorsForWalletsParameters);
 
 const appInfo = {
     appName: connectorsForWalletsParameters.appName,
-    learnMoreUrl: "https://localhost:3000",
+    learnMoreUrl: "https://comet.ing",
 };
 
 const connectors = connectorsForWallets(
@@ -71,42 +63,32 @@ const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
     );
 };
 
-const [defaultMainnetRpcUrl] = mainnet.rpcUrls.default.http;
-const [defaultSepoliaRpcUrl] = sepolia.rpcUrls.default.http;
 const [defaultFoundryRpcUrl] = foundry.rpcUrls.default.http;
-const [defaultOptimismRpcUrl] = optimism.rpcUrls.default.http;
-const [defaultOptimismSepoliaRpcUrl] = optimismSepolia.rpcUrls.default.http;
+const [defaultBaseSepoliaRpcUrl] = baseSepolia.rpcUrls.default.http;
+const [defaultBaseRpcUrl] = base.rpcUrls.default.http;
 
 const wagmiConfig = createConfig({
     ssr: true,
     connectors,
     chains: [chain],
     transports: {
-        [mainnet.id]: alchemyApiKey
-            ? fallback([
-                  http(`https://eth-mainnet.g.alchemy.com/v2/${alchemyApiKey}`),
-                  http(defaultMainnetRpcUrl),
-              ])
-            : http(defaultMainnetRpcUrl),
-        [sepolia.id]: alchemyApiKey
-            ? fallback([
-                  http(`https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
-                  http(defaultSepoliaRpcUrl),
-              ])
-            : http(defaultSepoliaRpcUrl),
         [foundry.id]: http(defaultFoundryRpcUrl),
-        [optimism.id]: alchemyApiKey
+        [base.id]: alchemyApiKey
             ? fallback([
-                  http(`https://opt-mainnet.g.alchemy.com/v2/${alchemyApiKey}`),
-                  http(defaultOptimismRpcUrl),
+                  http(
+                      `https://base-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
+                  ),
+                  http(defaultBaseRpcUrl),
               ])
-            : http(defaultOptimismRpcUrl),
-        [optimismSepolia.id]: alchemyApiKey
+            : http(defaultBaseRpcUrl),
+        [baseSepolia.id]: alchemyApiKey
             ? fallback([
-                  http(`https://opt-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
-                  http(defaultOptimismSepoliaRpcUrl),
+                  http(
+                      `https://base-sepolia.g.alchemy.com/v2/${alchemyApiKey}`,
+                  ),
+                  http(defaultBaseSepoliaRpcUrl),
               ])
-            : http(defaultOptimismSepoliaRpcUrl),
+            : http(defaultBaseSepoliaRpcUrl),
     },
 });
 
