@@ -5,6 +5,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import { JamDetails } from "../../../components/jams/JamDetail";
 import { fetchJamById } from "../../../components/jams/fetchers";
 import PageTitle from "../../../components/layout/pageTitle";
+import { getStartCometFrameMetadata } from "@jam/frames";
 
 type PageProps = {
     params: { id: string };
@@ -21,6 +22,9 @@ export async function generateMetadata({
         if (jam.description) {
             metadata.description = jam.description;
         }
+        metadata.other = getStartCometFrameMetadata({
+            endpointBaseUrl: process.env.WEB_APP_BASE_URL,
+        });
     } catch (error) {
         metadata.title = `Cometing - ${params.id}`;
     }
