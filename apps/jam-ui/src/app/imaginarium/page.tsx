@@ -1,7 +1,7 @@
+import { createImageFromContent } from "@jam/image-generator";
 import { Stack } from "@mantine/core";
 import { Metadata } from "next";
 import Image from "next/image";
-import nodeHtmlToImage from "node-html-to-image";
 import { downy, haiti } from "../../providers/colors";
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ async function createImgFromTextOfComet(cometId: number) {
     const data = {
         entries: [
             {
-                text: "Hello my first message here with some big text",
+                text: "Hello world from genesis content!!!",
                 address: "0x000000000",
             },
             { text: "Hello my second message here", address: "0x000000000" },
@@ -38,33 +38,14 @@ async function createImgFromTextOfComet(cometId: number) {
             { text: "Hello my first message here", address: "0x000000000" },
         ],
     };
+    const mappedContent = data.entries.map((value) => value.text);
 
-    const content = `
-        <html>
-            <head>
-                <style>
-                    html {
-                     background-color: ${haiti[9]}
-                    }
-                    body {
-                        width: 400px;
-                        height: 400px;                         
-                    }
-                    p {
-                        color: ${downy[2]};
-                        text-align:center;
-                    }
-                </style>
-            </head>
-            <body>
-                ${addParagraphs(data.entries)}
-            </body>
-        </html>
-    `;
-
-    return await nodeHtmlToImage({
-        html: content,
-        encoding: "base64",
+    return await createImageFromContent(mappedContent, {
+        backgroundColor: haiti[9] as `#${string}`,
+        textColor: downy[2] as `#${string}`,
+        converterOptions: {
+            encoding: "base64",
+        },
     });
 }
 

@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@jam/frames": "*",
+        "@jam/image-generator": "*",
         "@mantine/core": "^7.10.1",
         "@mantine/form": "^7.10.1",
         "@mantine/hooks": "^7.10.1",
@@ -27,7 +28,6 @@
         "graphql-request": "^5",
         "graphql-tag": "^2",
         "next": "14.2.3",
-        "node-html-to-image": "^4.0.0",
         "pino-pretty": "^10",
         "postcss": "^8.4.38",
         "postcss-preset-mantine": "^1.15.0",
