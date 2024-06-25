@@ -1,12 +1,19 @@
-import { prepareDonateFrameMetadata } from "@jam/frames";
 import { Group, Stack, Title } from "@mantine/core";
 import type { Metadata } from "next";
 import { FaChartSimple } from "react-icons/fa6";
 import { JamsStatsView } from "../components/jams/JamsStatsView";
 
-export const metadata: Metadata = prepareDonateFrameMetadata({
-    endpointBaseUrl: process.env.WEB_APP_BASE_URL,
-});
+export const metadata: Metadata = {
+    title: "Comet",
+    description: "Text co-creation platform",
+    openGraph: {
+        title: "Comet",
+        description: "Text co-creation platform",
+        images: [
+            "https://pbs.twimg.com/profile_images/1801339115935268864/myUfQhBo_400x400.jpg",
+        ],
+    },
+};
 
 export default function HomePage() {
     return (
