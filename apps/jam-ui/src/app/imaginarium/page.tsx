@@ -45,6 +45,14 @@ async function createImgFromTextOfComet(cometId: number) {
         textColor: downy[2] as `#${string}`,
         converterOptions: {
             encoding: "base64",
+            puppeteerArgs: {
+                headless: true,
+                args: [
+                    "--no-sandbox",
+                    "--remote-debugging-address=0.0.0.0",
+                    "--remote-debugging-port=9222",
+                ],
+            },
         },
     });
 }
