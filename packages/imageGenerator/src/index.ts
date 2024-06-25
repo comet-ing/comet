@@ -16,7 +16,7 @@ type Options = {
     width: string;
     height: string;
     // node-html-to-image options excluding the html content that is generated.
-    converterOptions: LibOpts;
+    converterOptions?: LibOpts;
 };
 
 type ContentReturned = ReturnType<typeof nodeHtmlToImage>;
@@ -51,9 +51,18 @@ export const createImageFromContent: CreateImageFromContent = async (
     const width = options.width ?? "400px";
     const bg = options.backgroundColor ?? "#352787";
     const txtColor = options.textColor ?? "#d5f5f2";
+    const converterOptions = options.converterOptions ?? {};
     const libOpts: LibOpts = {
         encoding: "base64",
-        ...options.converterOptions,
+        puppeteerArgs: {
+            headless: true,
+            args: [
+                "--no-sandbox",
+                "--remote-debugging-address=0.0.0.0",
+                "--remote-debugging-port=9222",
+            ],
+        },
+        ...converterOptions,
     };
 
     const content = `
