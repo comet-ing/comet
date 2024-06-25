@@ -17,6 +17,7 @@ function addParagraphs(list: { text: string; address: string }[]) {
 }
 
 async function createImgFromTextOfComet(cometId: number) {
+    // dummy structure to resemble the comet-info returned.
     const data = {
         entries: [
             {
@@ -26,16 +27,10 @@ async function createImgFromTextOfComet(cometId: number) {
             { text: "Hello my second message here", address: "0x000000000" },
             { text: "Hello my third message here", address: "0x000000000" },
             { text: "Hello my fourth message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
-            { text: "Hello my first message here", address: "0x000000000" },
+            { text: "Hello message here", address: "0x000000000" },
+            { text: "Hello message here", address: "0x000000000" },
+            { text: "Hello message here", address: "0x000000000" },
+            // add more text to check the truncation effect
         ],
     };
     const mappedContent = data.entries.map((value) => value.text);
@@ -43,6 +38,8 @@ async function createImgFromTextOfComet(cometId: number) {
     return await createImageFromContent(mappedContent, {
         backgroundColor: haiti[9] as `#${string}`,
         textColor: downy[2] as `#${string}`,
+        height: "400px",
+        width: "400px",
         converterOptions: {
             encoding: "base64",
             puppeteerArgs: {
@@ -58,6 +55,8 @@ async function createImgFromTextOfComet(cometId: number) {
 }
 
 export default async function JamsPage() {
+    // Used for example of backend generated base64 image.
+    // the whole page will be deleted before merging the branch.
     const base64Img = await createImgFromTextOfComet(1);
     return (
         <Stack>

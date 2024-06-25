@@ -13,6 +13,8 @@ type Options = {
     backgroundColor: Color;
     // image text color
     textColor: Color;
+    width: string;
+    height: string;
     // node-html-to-image options excluding the html content that is generated.
     converterOptions: LibOpts;
 };
@@ -32,10 +34,21 @@ function addParagraphs(list: string[]) {
     return paragraphs;
 }
 
+/**
+ * Return the list of text content passed as an PNG base64 encoded.
+ * Attention: If the height/width is not enough for the content it will
+ * be "truncated" like a overflow hidden equivalent effect.
+ *
+ * @param contentList
+ * @param options
+ * @returns
+ */
 export const createImageFromContent: CreateImageFromContent = async (
     contentList,
     options,
 ) => {
+    const height = options.height ?? "400px";
+    const width = options.width ?? "400px";
     const bg = options.backgroundColor ?? "#352787";
     const txtColor = options.textColor ?? "#d5f5f2";
     const libOpts: LibOpts = {
@@ -51,8 +64,9 @@ export const createImageFromContent: CreateImageFromContent = async (
                      background-color: ${bg}
                     }
                     body {
-                        width: 400px;
-                        height: 400px;                         
+                        width: ${width};
+                        height: ${height};
+                        padding-top: 8px;                        
                     }
                     p {
                         color: ${txtColor};
