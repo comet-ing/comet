@@ -27,6 +27,7 @@
         "graphql-request": "^5",
         "graphql-tag": "^2",
         "next": "14.2.3",
+        "node-html-to-image": "^4.0.0",
         "pino-pretty": "^10",
         "postcss": "^8.4.38",
         "postcss-preset-mantine": "^1.15.0",
