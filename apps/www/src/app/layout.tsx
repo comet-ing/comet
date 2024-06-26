@@ -1,6 +1,7 @@
 import { ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
 import type { Metadata } from "next";
+import { Plausible } from "../components/Plausible";
 import StyleProvider from "../providers/styleProvider";
 import { horizon } from "../styles/fonts";
 import "./globals.css";
@@ -18,6 +19,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <head>
+                <Plausible />
                 <ColorSchemeScript />
             </head>
 
