@@ -3,8 +3,7 @@ import {
     prepareFrameTransactionResponse,
 } from "@jam/frames";
 import { NextRequest, NextResponse } from "next/server";
-import { encodeFunctionData, parseEther, stringToHex } from "viem";
-import { baseSepolia } from "viem/chains";
+import { encodeFunctionData, parseEther, stringToHex, isHex } from "viem";
 
 const abi = [
     {
@@ -112,9 +111,6 @@ const abi = [
     },
 ];
 
-const INPUTBOX_CONTRACT_ADDR = "0x59b22D57D4f067708AB0c00552767405926dc768";
-const COMET_CONTRACT_ADDR = "0x56D9baA89f84ebdA027BcA24950F61Fc6DABd16E";
-
 async function getResponse(req: NextRequest): Promise<NextResponse | Response> {
     const request = await req.json();
     const isValid = await validateRequestMessage(request);
@@ -130,20 +126,27 @@ async function getResponse(req: NextRequest): Promise<NextResponse | Response> {
     };
     const input = stringToHex(JSON.stringify(textToAppend));
 
+    const COMET_CONTRACT_ADDR = process.env.NEXT_PUBLIC_APP_ADDRESS;
     const data = encodeFunctionData({
         abi,
         functionName: "addInput",
         args: [COMET_CONTRACT_ADDR, input],
     });
 
-    const chainId = `eip155:${baseSepolia.id}`;
-    const ethValue = parseEther("0").toString();
+    const INPUTBOX_CONTRACT_ADDR = process.env.INPUTBOX_CONTRACT_ADDRESS;
+    const chainId = `eip155:${process.env.NEXT_PUBLIC_CHAIN_ID}`;
+
+    console.log(chainId);
+
+    const ethValue = parseEther("0.00004").toString();
     const txData = prepareFrameTransactionResponse({
         chainId,
         data,
         toAddress: INPUTBOX_CONTRACT_ADDR,
         ethValue,
     });
+
+    console.log(txData);
 
     return NextResponse.json(txData);
 }
