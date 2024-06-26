@@ -1,4 +1,7 @@
-import { getFrameMessage } from "@coinbase/onchainkit/frame";
+import {
+    getFrameMessage,
+    FrameTransactionResponse,
+} from "@coinbase/onchainkit/frame";
 
 interface PrepareFrameMessageOpts {
     req: any;
@@ -17,6 +20,35 @@ const prepareFrameMessage = async <T>({
         }) as T;
     }
 };
+
+//=================================
+
+export interface FrameTransactionResponseOpts {
+    chainId: string;
+    data: string;
+    toAddress: string;
+    ethValue: string;
+}
+
+export const _prepareFrameTransactionResponse = ({
+    chainId,
+    data,
+    toAddress,
+    ethValue,
+}: FrameTransactionResponseOpts) => {
+    return {
+        chainId,
+        method: "eth_sendTransaction",
+        params: {
+            abi: [],
+            data,
+            to: toAddress,
+            value: ethValue, // TODO Is it needed?
+        },
+    } as FrameTransactionResponse;
+};
+
+//=================================
 
 export const _validateRequestMessage = async (
     request: any,

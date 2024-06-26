@@ -24,6 +24,7 @@ export async function generateMetadata({
         }
         metadata.other = getStartCometFrameMetadata({
             endpointBaseUrl: process.env.WEB_APP_BASE_URL,
+            cometId: params.id,
         });
     } catch (error) {
         metadata.title = `Cometing - ${params.id}`;

@@ -1,18 +1,16 @@
 import {
-    getFrameMessage,
-    getFrameMetadata,
-    FrameTransactionResponse,
-    getFrameHtmlResponse,
-} from "@coinbase/onchainkit/frame";
-import { _validateRequestMessage } from "./utils.js";
-import {
-    _getStartCometFrameMetadata,
-    _getStartCometHTMLResponse,
-} from "./start-comet.js";
+    _validateRequestMessage,
+    _prepareFrameTransactionResponse,
+} from "./utils.js";
+import { _getStartCometFrameMetadata } from "./start-comet.js";
+import { _getSubmitTextFrameMetadata } from "./submit-text.js";
+import { _getSuccessFrameMetadata } from "./success.js";
 
 // UTILS
 export const validateRequestMessage = _validateRequestMessage;
+export const prepareFrameTransactionResponse = _prepareFrameTransactionResponse;
 
-// START-COMET
+// Frames
 export const getStartCometFrameMetadata = _getStartCometFrameMetadata;
-export const getStartCometHTMLResponse = _getStartCometHTMLResponse;
+export const getSubmitTextFrameMetadata = _getSubmitTextFrameMetadata;
+export const getSuccessFrameMetadata = _getSuccessFrameMetadata;

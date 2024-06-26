@@ -1,4 +1,4 @@
-import { validateRequestMessage, getStartCometHTMLResponse } from "@jam/frames";
+import { getSuccessFrameMetadata, validateRequestMessage } from "@jam/frames";
 import { NextRequest, NextResponse } from "next/server";
 
 async function getResponse(req: NextRequest): Promise<NextResponse | Response> {
@@ -9,7 +9,9 @@ async function getResponse(req: NextRequest): Promise<NextResponse | Response> {
         return new NextResponse("Message not valid", { status: 500 });
     }
 
-    return NextResponse.json({ status: "success" });
+    return new NextResponse(
+        getSuccessFrameMetadata(process.env.WEB_APP_BASE_URL),
+    );
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
