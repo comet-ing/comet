@@ -30,7 +30,7 @@ export interface FrameTransactionResponseOpts {
     ethValue: string;
 }
 
-export const _prepareFrameTransactionResponse = ({
+export const _prepareFrameTransactionResponse = <FrameTransactionResponse>({
     chainId,
     data,
     toAddress,
@@ -50,13 +50,16 @@ export const _prepareFrameTransactionResponse = ({
 
 //=================================
 
-export const _validateRequestMessage = async (
-    request: any,
-): Promise<boolean> => {
+interface FrameMessage {
+    isValid: boolean;
+    message: any;
+}
+
+export const _validateRequestMessage = async <T>(request: any) => {
     const neynarApiKey = process.env.NEYNAR_ONCHAIN_KIT_API_KEY || "";
-    const { isValid } = (await prepareFrameMessage({
+    const { isValid, message } = (await prepareFrameMessage({
         req: request,
         apiKey: neynarApiKey,
-    })) as { isValid: boolean };
-    return isValid;
+    })) as FrameMessage;
+    return { isValid, message: message.input } as T;
 };

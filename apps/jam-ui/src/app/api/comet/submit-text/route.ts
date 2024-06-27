@@ -1,6 +1,6 @@
 import {
-    validateRequestMessage,
     prepareFrameTransactionResponse,
+    validateRequestMessage,
 } from "@jam/frames";
 import { NextRequest, NextResponse } from "next/server";
 import { encodeFunctionData, parseEther, stringToHex, isHex } from "viem";
@@ -113,18 +113,37 @@ const abi = [
 
 async function getResponse(req: NextRequest): Promise<NextResponse | Response> {
     const request = await req.json();
-    const isValid = await validateRequestMessage(request);
+    const { isValid, message } = (await validateRequestMessage(request)) as {
+        isValid: boolean;
+        message: string;
+    };
 
     if (!isValid) {
-        return new NextResponse("Message not valid", { status: 500 });
+        return NextResponse.json(
+            { error: "Message not valid" },
+            { status: 500 },
+        );
+    }
+    if (message === undefined || !message) {
+        return NextResponse.json(
+            { error: "Empty string received" },
+            { status: 500 },
+        );
     }
 
-    const textToAppend = {
+    const { searchParams } = new URL(req.url);
+    const cometId: string | null = searchParams.get("cometId");
+    if (!cometId) {
+        return new NextResponse("cometId is undefined", { status: 500 });
+    }
+
+    const userText = message;
+    const appendTextCommand = {
         action: "jam.append",
-        jamID: 0,
-        entry: "Skies are blue",
+        jamID: cometId,
+        entry: userText,
     };
-    const input = stringToHex(JSON.stringify(textToAppend));
+    const input = stringToHex(JSON.stringify(appendTextCommand));
 
     const COMET_CONTRACT_ADDR = process.env.NEXT_PUBLIC_APP_ADDRESS;
     const data = encodeFunctionData({
@@ -135,18 +154,13 @@ async function getResponse(req: NextRequest): Promise<NextResponse | Response> {
 
     const INPUTBOX_CONTRACT_ADDR = process.env.INPUTBOX_CONTRACT_ADDRESS;
     const chainId = `eip155:${process.env.NEXT_PUBLIC_CHAIN_ID}`;
-
-    console.log(chainId);
-
-    const ethValue = parseEther("0.00004").toString();
+    const ethValue = parseEther("0").toString();
     const txData = prepareFrameTransactionResponse({
         chainId,
         data,
         toAddress: INPUTBOX_CONTRACT_ADDR,
         ethValue,
     });
-
-    console.log(txData);
 
     return NextResponse.json(txData);
 }

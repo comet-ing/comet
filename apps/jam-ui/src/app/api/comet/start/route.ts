@@ -12,10 +12,14 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
         return new NextResponse("Message not valid", { status: 500 });
     }
 
-    console.log(getSubmitTextFrameMetadata(process.env.WEB_APP_BASE_URL));
+    const { searchParams } = new URL(req.url);
+    const cometId: string | null = searchParams.get("cometId");
+    if (!cometId) {
+        return new NextResponse("cometId is undefined", { status: 500 });
+    }
 
     return new NextResponse(
-        getSubmitTextFrameMetadata(process.env.WEB_APP_BASE_URL),
+        getSubmitTextFrameMetadata(process.env.WEB_APP_BASE_URL, cometId),
     );
 }
 

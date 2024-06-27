@@ -14,7 +14,7 @@ export const _getStartCometFrameMetadata = <T>({
             {
                 action: "post",
                 label: "Start",
-                target: `${endpointBaseUrl}/api/comet/start/`,
+                target: `${endpointBaseUrl}/api/comet/start?cometId=${cometId}`,
             },
         ],
         image: {

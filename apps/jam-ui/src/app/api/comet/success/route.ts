@@ -1,7 +1,7 @@
 import { getSuccessFrameMetadata, validateRequestMessage } from "@jam/frames";
 import { NextRequest, NextResponse } from "next/server";
 
-async function getResponse(req: NextRequest): Promise<NextResponse | Response> {
+async function getResponse(req: NextRequest): Promise<NextResponse> {
     const request = await req.json();
     const isValid = await validateRequestMessage(request);
 
