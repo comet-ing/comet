@@ -19,6 +19,11 @@ declare namespace NodeJS {
         NEXT_PUBLIC_APP_ADDRESS: string;
 
         /**
+         * Contract address of the inputbox contract
+         */
+        INPUTBOX_CONTRACT_ADDRESS: string;
+
+        /**
          * Host/domain of the web application to be used when interacting with
          * Warpcast frames
          */
