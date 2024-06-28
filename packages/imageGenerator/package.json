@@ -1,0 +1,34 @@
+{
+    "name": "@jam/image-generator",
+    "version": "0.0.0",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "type": "module",
+    "files": [
+        "dist"
+    ],
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "sideEffects": false,
+    "license": "Apache-2.0",
+    "scripts": {
+        "build": "tsup",
+        "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+        "dev": "tsup --watch"
+    },
+    "devDependencies": {
+        "@jam/tsconfig": "*",
+        "@types/node": "^20.10.0",
+        "node-html-to-image": "^4.0.0",
+        "tsup": "^7",
+        "typescript": "^5"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}
