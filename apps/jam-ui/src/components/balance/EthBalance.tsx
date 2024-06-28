@@ -6,6 +6,7 @@ import {
     Stack,
     Text,
     Title,
+    Transition,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -60,11 +61,22 @@ export const EthBalance: FC = () => {
                 <Text>{formatEther(data)} </Text>
             </Group>
 
-            {hasBalance && (
-                <Button onClick={openModal} rightSection={<FaEthereum />}>
-                    Withdraw
-                </Button>
-            )}
+            <Transition
+                mounted={hasBalance}
+                transition="scale-x"
+                duration={400}
+                timingFunction="ease"
+            >
+                {(styles) => (
+                    <Button
+                        style={styles}
+                        onClick={openModal}
+                        leftSection={<FaEthereum />}
+                    >
+                        Withdraw
+                    </Button>
+                )}
+            </Transition>
             <Modal
                 opened={showform}
                 onClose={closeModal}

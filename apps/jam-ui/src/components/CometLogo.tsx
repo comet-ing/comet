@@ -48,7 +48,7 @@ const CometLogo: FC<Props> = (props) => {
                         </g>
                     </mask>
                 </defs>
-                <path fill="#fff" d="M-81-81h972v972H-81z" />
+                <path fill={color} d="M-81-81h972v972H-81z" />
                 <path fill={color} d="M-81-81h972v972H-81z" />
                 <g clipPath="url(#c)" mask="url(#d)">
                     <image

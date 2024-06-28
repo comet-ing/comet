@@ -51,7 +51,7 @@ export default function JamsView() {
 
     return (
         <Stack>
-            <Group justify="space-between">
+            <Group>
                 <SegmentedControl
                     color="haiti"
                     data={[
@@ -75,7 +75,7 @@ export default function JamsView() {
                         variant="filled"
                         onClick={openModal}
                         disabled={!isConnected}
-                        rightSection={<FaMeteor />}
+                        leftSection={<FaMeteor />}
                     >
                         CREATE COMET
                     </Button>
@@ -93,7 +93,7 @@ export default function JamsView() {
             ) : (
                 <Center>
                     <Text fw={600} size="xl">
-                        No Comets found!
+                        No comets found!
                     </Text>
                 </Center>
             )}
