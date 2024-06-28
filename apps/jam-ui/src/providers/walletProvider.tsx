@@ -10,7 +10,12 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { ThemeOptions } from "@rainbow-me/rainbowkit/dist/themes/baseTheme";
 import "@rainbow-me/rainbowkit/styles.css";
-import { ledgerWallet, trustWallet } from "@rainbow-me/rainbowkit/wallets";
+import {
+    coinbaseWallet,
+    metaMaskWallet,
+    trustWallet,
+    walletConnectWallet,
+} from "@rainbow-me/rainbowkit/wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Image from "next/image";
 import { ReactNode } from "react";
@@ -38,12 +43,21 @@ const appInfo = {
     learnMoreUrl: "https://comet.ing",
 };
 
+coinbaseWallet.preference = "smartWalletOnly";
+
 const connectors = connectorsForWallets(
     [
-        ...wallets,
+        {
+            groupName: "Recommended",
+            wallets: [coinbaseWallet],
+        },
+        {
+            groupName: "Popular",
+            wallets: [metaMaskWallet, walletConnectWallet],
+        },
         {
             groupName: "Other",
-            wallets: [trustWallet, ledgerWallet],
+            wallets: [trustWallet],
         },
     ],
     connectorsForWalletsParameters,
@@ -71,6 +85,7 @@ const wagmiConfig = createConfig({
     ssr: true,
     connectors,
     chains: [chain],
+    multiInjectedProviderDiscovery: false,
     transports: {
         [foundry.id]: http(defaultFoundryRpcUrl),
         [base.id]: alchemyApiKey

@@ -5,6 +5,7 @@ import "@mantine/notifications/styles.css";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
+import { Plausible } from "../components/Plausible";
 import { Providers } from "../providers/providers";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -26,6 +27,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <head>
+                <Plausible />
                 <ColorSchemeScript />
             </head>
             <body className={inter.className}>

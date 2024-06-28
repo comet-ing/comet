@@ -15,6 +15,7 @@
         "codegen:graphql": "graphql-codegen"
     },
     "dependencies": {
+        "@coinbase/wallet-sdk": "^4.0.4",
         "@jam/frames": "*",
         "@mantine/core": "^7.10.1",
         "@mantine/form": "^7.10.1",
