@@ -36,7 +36,7 @@ type MintButtonProp = {
 };
 
 const MintButton: FC<MintButtonProp> = ({ jamId, price }) => {
-    const { chain } = useAccount();
+    const { chain, isConnected } = useAccount();
 
     const address = useApplicationAddress();
     const execLayerData = stringToHex(
@@ -83,7 +83,7 @@ const MintButton: FC<MintButtonProp> = ({ jamId, price }) => {
     return (
         <Button
             variant="filled"
-            disabled={!canSubmit}
+            disabled={!isConnected || !canSubmit}
             leftSection={<FaCheck />}
             loading={loading}
             onClick={() => execute.writeContract(prepare.data!.request)}

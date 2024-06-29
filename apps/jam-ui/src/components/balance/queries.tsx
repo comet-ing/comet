@@ -40,7 +40,7 @@ export const useGetBalance = (account?: Address) => {
     return useQuery({
         queryKey: balanceKeys.detail(account ?? zeroAddress),
         queryFn: () => fetchBalance(account),
-        refetchInterval: 20 * 1000,
+        refetchInterval: 180 * 1000,
         refetchIntervalInBackground: true,
     });
 };
