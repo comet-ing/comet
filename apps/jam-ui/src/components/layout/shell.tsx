@@ -16,6 +16,7 @@ import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
 import { FaHome, FaPencilAlt, FaTags } from "react-icons/fa";
+import { FaImages } from "react-icons/fa6";
 import { TbMoonStars, TbSun } from "react-icons/tb";
 import { useAccount } from "wagmi";
 import CometLogo from "../CometLogo";
@@ -102,7 +103,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         onClick={closeMobileMenu}
                         href="/jams"
                         leftSection={<FaPencilAlt />}
-                        data-testid="jams-link"
+                        data-testid="comets-link"
                     />
 
                     <NavLink
@@ -111,7 +112,16 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                         onClick={closeMobileMenu}
                         href="/collections"
                         leftSection={<FaTags />}
-                        data-testid="jams-link"
+                        data-testid="collections-link"
+                    />
+
+                    <NavLink
+                        component={Link}
+                        label="Imaginarium"
+                        onClick={closeMobileMenu}
+                        href="/imaginarium"
+                        leftSection={<FaImages />}
+                        data-testid="imaginarium-link"
                     />
 
                     <Stack style={{ marginTop: "auto" }} gap="lg">
