@@ -5,6 +5,7 @@ import { parseReportPayload } from "../../utils/rollups.inspect";
 import { InspectResponseBody } from "../../utils/rollups.types";
 
 const rollupHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
+const dappAddress = process.env.NEXT_PUBLIC_DAPP_ADDRESS;
 
 export const balanceKeys = {
     base: ["balance"] as const,
@@ -17,7 +18,7 @@ const createError = (message: string) => Promise.reject(new Error(message));
 const fetchBalance = async (account?: Address) => {
     if (account === undefined || account === null) return 0n;
 
-    const url = `${rollupHost}/inspect/balance/${account}`;
+    const url = `${rollupHost}/inspect/${dappAddress}/balance/${account}`;
 
     const response = await fetch(url);
 
