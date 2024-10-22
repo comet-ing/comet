@@ -5,7 +5,7 @@ import { parseReportPayload } from "../../utils/rollups.inspect";
 import { InspectResponseBody } from "../../utils/rollups.types";
 
 const rollupHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
-const dappAddress = process.env.NEXT_PUBLIC_DAPP_ADDRESS;
+const dappAddress = process.env.NEXT_PUBLIC_APP_ADDRESS;
 
 export const balanceKeys = {
     base: ["balance"] as const,

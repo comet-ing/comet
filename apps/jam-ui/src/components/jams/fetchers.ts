@@ -3,7 +3,7 @@ import { InspectResponseBody, Report } from "../../utils/rollups.types";
 import { Jam, JamListFilter, JamStats } from "./types";
 
 const rollupHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
-const dappAddress = process.env.NEXT_PUBLIC_DAPP_ADDRESS;
+const dappAddress = process.env.NEXT_PUBLIC_APP_ADDRESS;
 
 const parseReport = <T>(report: Report, defaultValue: any): T => {
     if (report) {
