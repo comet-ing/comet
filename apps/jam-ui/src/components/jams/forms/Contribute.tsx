@@ -1,8 +1,8 @@
 "use client";
-import { Button, Collapse, Group, Stack, Textarea } from "@mantine/core";
+import { Button, Collapse, Group, Stack, Textarea, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue } from "@mantine/hooks";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { Hex, stringToHex } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
@@ -13,6 +13,7 @@ import {
 import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
 import { TransactionProgress } from "../../TransactionProgress";
 import { transactionState } from "../../TransactionState";
+import { getClient, getWalletClient } from "../../../utils/chain";
 
 export interface Props {
     onSuccess?: () => void;
@@ -73,6 +74,119 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
     const [debouncedLoading] = useDebouncedValue(loading, 500);
     const [debouncedCanSubmit] = useDebouncedValue(canSubmit, 500);
 
+    const [cartesiTxId, setCartesiTxId] = useState<string>("");
+
+    const l2DevNonceUrl = "http://localhost:8080/nonce";
+    const l2DevSendTransactionUrl = "http://localhost:8080/submit";
+
+    const typedData = {
+        domain: {
+            name: "Cartesi",
+            version: "0.1.0",
+            chainId: BigInt(0), // This will be set dynamically
+            verifyingContract: "0x0000000000000000000000000000000000000000",
+        } as const,
+        types: {
+            EIP712Domain: [
+                { name: "name", type: "string" },
+                { name: "version", type: "string" },
+                { name: "chainId", type: "uint256" },
+                { name: "verifyingContract", type: "address" },
+            ],
+            CartesiMessage: [
+                { name: "app", type: "address" },
+                { name: "nonce", type: "uint64" },
+                { name: "max_gas_price", type: "uint128" },
+                { name: "data", type: "bytes" },
+            ],
+        } as const,
+        primaryType: "CartesiMessage" as const,
+        message: {
+            app: "0x" as `0x${string}`,
+            nonce: BigInt(0),
+            data: "0x" as `0x${string}`,
+            max_gas_price: BigInt(10)
+        },
+    };
+
+    const fetchNonceL2 = async (user: any, application: any) => {
+        const response = await fetch(l2DevNonceUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ msg_sender: user, app_contract: application })
+        });
+
+        const responseData = await response.json();
+        return responseData.nonce;
+    };
+
+    const submitTransactionL2 = async (fullBody: any) => {
+        const body = JSON.stringify(fullBody);
+        const response = await fetch(l2DevSendTransactionUrl, {
+            method: 'POST',
+            body,
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            console.log("submit to L2 failed");
+            throw new Error("submit to L2 failed: " + await response.text());
+        } else {
+            return response.json();
+        }
+    };
+
+    const addTransactionL2 = async () => {
+        console.log("adding TransactionL2");
+        //const chainId = await execute.chainId;
+        const chainId = "0x7a69"; // TODO: get dynamically
+        console.log("chainId", chainId);
+        if (chainId) {
+            const walletClient = await getWalletClient(chainId);
+            if (!walletClient) return;
+            const [account] = await walletClient.requestAddresses();
+            if (!account) return;
+
+            // Create the payload with "action": "jam.create"
+            const payloadData = {
+                action: "jam.append",
+                ...form.values
+            };
+
+            const payload = stringToHex(JSON.stringify(payloadData));
+            const app = address;
+            const nonce = await fetchNonceL2(account, app);
+            
+            typedData.domain.chainId = BigInt(chainId);
+            typedData.message = {
+                app,
+                nonce,
+                data: payload,
+                max_gas_price: BigInt(10),
+            };
+
+            try {
+                setCartesiTxId("");
+                const signature = await walletClient.signTypedData({ account, ...typedData });
+                const l2data = JSON.parse(JSON.stringify({
+                    typedData,
+                    account,
+                    signature,
+                }, (_, value) =>
+                    typeof value === 'bigint'
+                        ? Number(value)
+                        : value
+                ));
+                const res = await submitTransactionL2(l2data);
+                setCartesiTxId(res.id);
+                if (onSuccess) onSuccess();
+            } catch (e) {
+                console.error(`Error in L2 transaction: ${e}`);
+            }
+        }
+    };
+
     useEffect(() => {
         if (wait.isSuccess) {
             form.reset();
@@ -85,7 +199,7 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
     }, [wait.isSuccess, onSuccess, form, execute]);
 
     return (
-        <form id="append-jam-form">
+        <form id="contribute-form">
             <Stack>
                 <Textarea
                     autosize
@@ -125,9 +239,24 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
                             execute.writeContract(prepare.data!.request)
                         }
                     >
-                        ADD
+                        ADD (L1)
+                    </Button>
+                    <Button
+                        variant="outline"
+                        disabled={!form.isValid()}
+                        leftSection={<FaCheck />}
+                        loading={debouncedLoading}
+                        onClick={addTransactionL2}
+                    >
+                        ADD (L2)
                     </Button>
                 </Group>
+
+                {cartesiTxId && (
+                    <Text size="sm" c="dimmed">
+                        L2 Transaction ID: {cartesiTxId}
+                    </Text>
+                )}
             </Stack>
         </form>
     );

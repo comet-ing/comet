@@ -7,6 +7,8 @@ import {
     slice,
     encodeFunctionData,
     parseEther,
+    toHex,
+    padHex,
   } from "viem";
   import Jam from "./JamManager.js";
   import { createApp } from "@deroll/app";
@@ -46,6 +48,7 @@ import {
             try {
               // Use the wallet's handler to process the deposit
               await wallet.handler({ metadata, payload });
+              
               console.log("Wallet after deposit: ", wallet.getWallet(getAddress(slice(payload, 0, 20))))
             } catch (error) {
                 console.log("Error in eth deposit", error);
@@ -74,7 +77,7 @@ import {
                 const jamToMint = Jam.getJamByID(etherDepositExecJSON.jamID);
                 console.log("Jam fetched: ", jamToMint);
                 if (jamToMint === null) {
-                    app.createReport({
+                    await app.createReport({
                         payload: stringToHex("Jam not found with given ID"),
                     });
                     return "accept";
@@ -91,19 +94,32 @@ import {
                         functionName: "mint",
                         args: [input_data[0], etherDepositExecJSON.jamID],
                     });
-                    app.createVoucher({
-                        destination: nft_erc1155_address,
-                        payload: callData,
-                    });
-                    Jam.updateCreatorsBalance(
-                        etherDepositExecJSON.jamID,
-                        input_data[0],
-                        wallet,
-                    );
-                    jamToMint.handleMintStats(jamMintPrice); 
+                    console.log("Creating voucher for minting: ", callData);
+                    try {
+                        await app.createVoucher({
+                            destination: nft_erc1155_address,
+                            value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                            payload: callData,
+                        });
+                    } catch (error) {
+                        console.error("Error creating voucher for minting:", error);
+                        await app.createReport({ payload: stringToHex(`Error creating voucher for minting: ${error.message}`) });
+                        return "reject";
+                    }
+                    try {
+                        Jam.updateCreatorsBalance(
+                            etherDepositExecJSON.jamID,
+                            input_data[0],
+                            wallet,
+                        );
+                        jamToMint.handleMintStats(jamMintPrice);
+                    } catch (error) {
+                        console.error("Error updating creator balance or mint stats:", error);
+                        await app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
+                    }
                 } else {
                     console.log("Insufficient balance to mint. Deposit ether.");
-                    app.createReport({
+                    await app.createReport({
                         payload: stringToHex(
                             "Insufficient balance to mint. Deposit ether.",
                         ),
@@ -131,52 +147,84 @@ import {
         console.log("Payload : ", input);
         input = JSON.parse(input);
   
-        switch (input.action) {
-            case "jam.setNFTAddress":
-                nft_erc1155_address = getAddress(input.address);
-                console.log("NFT Contract address set as: ", nft_erc1155_address);
-                break;
-            case "jam.create":
-                const newJam = new Jam(
-                    input.name,
-                    input.description,
-                    input.mintPrice,
-                    input.maxEntries,
-                    input.genesisEntry,
-                    sender,
-                );
-                console.log("New Jam created: ", newJam);
-                break;
-            case "jam.append":
-                try {
-                    const jam = Jam.getJamByID(input.jamID);
-                    if (!jam) {
-                        throw new Error(`Jam with ID ${input.jamID} not found.`);
+        try {
+            switch (input.action) {
+                case "jam.setNFTAddress":
+                    nft_erc1155_address = getAddress(input.address);
+                    console.log("NFT Contract address set as: ", nft_erc1155_address);
+                    break;
+                case "jam.create":
+                    const newJam = new Jam(
+                        input.name,
+                        input.description,
+                        input.mintPrice,
+                        input.maxEntries,
+                        input.genesisEntry,
+                        sender,
+                    );
+                    console.log("New Jam created: ", newJam);
+                    break;
+                case "jam.append":
+                    try {
+                        const jam = Jam.getJamByID(input.jamID);
+                        if (!jam) {
+                            throw new Error(`Jam with ID ${input.jamID} not found.`);
+                        }
+                        
+                        Jam.appendToJamByID(input.jamID, sender, input.entry);
+                        console.log("Appended to JamID: ", input.jamID);
+                        
+                        // Create and send the notice
+                        /*
+                        const notice = {
+                            "__push_notification__": true,
+                            "type": "instant",
+                            "message": `New contribution recorded in comet id #${jam.id}.`,
+                            "target": "*"
+                        };
+                        
+                        
+                        app.createNotice({ payload: stringToHex(JSON.stringify(notice)) }); */
+                    } catch (error) {
+                        console.error("Error in jam.append:", error);
+                        await app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
+                        return "reject";
                     }
-                    
-                    Jam.appendToJamByID(input.jamID, sender, input.entry);
-                    console.log("Appended to JamID: ", input.jamID);
-                    
-                } catch (error) {
-                    console.error("Error in jam.append:", error);
-                    app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
-                    return "reject";
-                }
-                break;
-            case "eth.withdraw":
-                console.log("Withdraw ether");
-                const amountToWithdraw = parseEther(String(input.amount));
-                const voucher = wallet.withdrawEther(sender, amountToWithdraw);
-                await app.createVoucher(voucher);
-                break;
-            default:
-                throw new Error("Invalid input action");
+                    break;
+                case "eth.withdraw":
+                    console.log("Withdraw ether");
+                    const amountToWithdraw = parseEther(String(input.amount));
+                    try {
+                        const voucher = wallet.withdrawEther(sender, amountToWithdraw);
+                        console.log("Voucher for eth withdrawal: ", voucher);
+                        
+                        // Ensure the value is a 32-byte hex string
+                        const paddedValue = padHex(toHex(voucher.value), { size: 32 });
+                        
+                        await app.createVoucher({
+                            destination: voucher.destination,
+                            payload: voucher.payload,
+                            value: paddedValue
+                        });
+                    } catch (error) {
+                        console.error("Error withdrawing ether:", error);
+                        await app.createReport({ payload: stringToHex(`Error withdrawing ether: ${error.message}`) });
+                        return "reject";
+                    }
+                    break;
+                default:
+                    throw new Error("Invalid input action");
+            }
+        } catch (error) {
+            console.error("Error processing jam action:", error);
+            await app.createReport({ payload: stringToHex(`Error processing jam action: ${error.message}`) });
+            return "reject";
         }
   
         return "accept";
     } catch (error) {
         console.error("Error in advance handler:", error);
-        app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
+        await app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
         return "reject";
     }
   });
@@ -191,20 +239,25 @@ import {
         switch (payloadArr[0]) {
             case "alljams":
                 const allJams = Jam.allJams;
-                app.createReport({ payload: stringToHex(JSON.stringify(allJams)) });
+                try {
+                    await app.createReport({ payload: stringToHex(JSON.stringify(allJams)) });
+                } catch (error) {
+                    console.error("Error stringifying allJams:", error);
+                    await app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
+                }
                 break;
             case "jams":
                 const jamID = payloadArr[1];
                 const jamByID = Jam.getJamByID(Number(jamID));
-                app.createReport({ payload: stringToHex(JSON.stringify(jamByID)) });
+                await app.createReport({ payload: stringToHex(JSON.stringify(jamByID)) });
                 break;
             case "openjams":
                 const openJams = Jam.getJamsByStatus("open");
-                app.createReport({ payload: stringToHex(JSON.stringify(openJams)) });
+                await app.createReport({ payload: stringToHex(JSON.stringify(openJams)) });
                 break;
             case "closedjams":
                 const closedJams = Jam.getJamsByStatus("closed");
-                app.createReport({ payload: stringToHex(JSON.stringify(closedJams)) });
+                await app.createReport({ payload: stringToHex(JSON.stringify(closedJams)) });
                 break;
             case "user":
                 const userAddress = getAddress(payloadArr[1]);
@@ -214,7 +267,7 @@ import {
                     creator: creatorJams,
                     participant: participantJams,
                 };
-                app.createReport({ payload: stringToHex(JSON.stringify(userJams)) });
+                await app.createReport({ payload: stringToHex(JSON.stringify(userJams)) });
                 break;
             case "balance":
                 const balanceUserAddress = getAddress(payloadArr[1]);
@@ -224,7 +277,7 @@ import {
                 break;
             case "jamstats":
                 const allJamStats = Jam.getAllJamsStats();
-                app.createReport({ payload: stringToHex(JSON.stringify(allJamStats)) });
+                await app.createReport({ payload: stringToHex(JSON.stringify(allJamStats)) });
                 break;
             default:
                 throw new Error("Invalid inspect action");
@@ -233,7 +286,7 @@ import {
         return "accept";
     } catch (error) {
         console.error("Error in inspect handler:", error);
-        app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
+        await app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
         return "reject";
     }
   });
@@ -243,5 +296,4 @@ import {
     console.error(e);
     process.exit(1);
   });
-  
   

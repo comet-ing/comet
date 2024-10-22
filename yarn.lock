@@ -509,9 +509,9 @@
     to-fast-properties "^2.0.0"
 
 "@cartesi/rollups@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@cartesi/rollups/-/rollups-1.4.0.tgz#a044782ab109b081b54741bdaa2a32707c050e62"
-  integrity sha512-remwnm4Rgkhzoc3F2YQw4nXJk0ggvmwdgGQxF5Gps7Ej3zY2qLCUS7OscMX5P9RFjpWnJ7mtlEXydVaUR4XXrQ==
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@cartesi/rollups/-/rollups-1.4.2.tgz#35d1d5bc6d989b3c970b7e99c4607062a875b0ff"
+  integrity sha512-v3ZPbkBhcIBfRRdLfiltwNvSRBtdX+9dH+lvMc9sLhUwWsMoHtCZutvPjT2xuwM+Pi+5820w6AuSELcPrVMXKQ==
   dependencies:
     "@cartesi/util" "6.3.0"
     "@openzeppelin/contracts" "4.9.2"

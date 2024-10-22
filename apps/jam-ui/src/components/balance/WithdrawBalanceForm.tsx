@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue } from "@mantine/hooks";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { FaEthereum } from "react-icons/fa";
 import { Hex, formatUnits, parseUnits, stringToHex } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
@@ -21,6 +21,7 @@ import {
 import { useApplicationAddress } from "../../hooks/useApplicationAddress";
 import { TransactionProgress } from "../TransactionProgress";
 import { transactionState } from "../TransactionState";
+import { getWalletClient } from "../../utils/chain";
 
 export interface Props {
     onSuccess?: () => void;
@@ -96,6 +97,117 @@ export const WithdrawBalanceForm: FC<Props> = ({ onSuccess, balance }) => {
 
     const [debouncedLoading] = useDebouncedValue(loading, 500);
     const [debouncedCanSubmit] = useDebouncedValue(canSubmit, 500);
+
+    const [cartesiTxId, setCartesiTxId] = useState<string>("");
+
+    const l2DevNonceUrl = "http://localhost:8080/nonce";
+    const l2DevSendTransactionUrl = "http://localhost:8080/submit";
+
+    const typedData = {
+        domain: {
+            name: "Cartesi",
+            version: "0.1.0",
+            chainId: BigInt(0),
+            verifyingContract: "0x0000000000000000000000000000000000000000",
+        } as const,
+        types: {
+            EIP712Domain: [
+                { name: "name", type: "string" },
+                { name: "version", type: "string" },
+                { name: "chainId", type: "uint256" },
+                { name: "verifyingContract", type: "address" },
+            ],
+            CartesiMessage: [
+                { name: "app", type: "address" },
+                { name: "nonce", type: "uint64" },
+                { name: "max_gas_price", type: "uint128" },
+                { name: "data", type: "bytes" },
+            ],
+        } as const,
+        primaryType: "CartesiMessage" as const,
+        message: {
+            app: "0x" as `0x${string}`,
+            nonce: BigInt(0),
+            data: "0x" as `0x${string}`,
+            max_gas_price: BigInt(10)
+        },
+    };
+
+    const fetchNonceL2 = async (user: any, application: any) => {
+        const response = await fetch(l2DevNonceUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ msg_sender: user, app_contract: application })
+        });
+
+        const responseData = await response.json();
+        return responseData.nonce;
+    };
+
+    const submitTransactionL2 = async (fullBody: any) => {
+        const body = JSON.stringify(fullBody);
+        const response = await fetch(l2DevSendTransactionUrl, {
+            method: 'POST',
+            body,
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            console.log("submit to L2 failed");
+            throw new Error("submit to L2 failed: " + await response.text());
+        } else {
+            return response.json();
+        }
+    };
+
+    const withdrawEtherL2 = async () => {
+        console.log("Withdrawing Ether L2");
+        const chainId = "0x7a69"; // TODO: get dynamically
+        console.log("chainId", chainId);
+        if (chainId) {
+            const walletClient = await getWalletClient(chainId);
+            if (!walletClient) return;
+            const [account] = await walletClient.requestAddresses();
+            if (!account) return;
+
+            const payloadData = {
+                action: "eth.withdraw",
+                amount: form.values.amount,
+            };
+
+            const payload = stringToHex(JSON.stringify(payloadData));
+            const app = address;
+            const nonce = await fetchNonceL2(account, app);
+            
+            typedData.domain.chainId = BigInt(chainId);
+            typedData.message = {
+                app,
+                nonce,
+                data: payload,
+                max_gas_price: BigInt(10),
+            };
+
+            try {
+                setCartesiTxId("");
+                const signature = await walletClient.signTypedData({ account, ...typedData });
+                const l2data = JSON.parse(JSON.stringify({
+                    typedData,
+                    account,
+                    signature,
+                }, (_, value) =>
+                    typeof value === 'bigint'
+                        ? Number(value)
+                        : value
+                ));
+                const res = await submitTransactionL2(l2data);
+                setCartesiTxId(res.id);
+                if (onSuccess) onSuccess();
+            } catch (e) {
+                console.error(`Error in L2 transaction: ${e}`);
+            }
+        }
+    };
 
     useEffect(() => {
         if (wait.isSuccess) {
@@ -180,9 +292,24 @@ export const WithdrawBalanceForm: FC<Props> = ({ onSuccess, balance }) => {
                             execute.writeContract(prepare.data!.request)
                         }
                     >
-                        WITHDRAW
+                        WITHDRAW (L1)
+                    </Button>
+                    <Button
+                        variant="outline"
+                        disabled={!form.isValid()}
+                        leftSection={<FaEthereum />}
+                        loading={debouncedLoading}
+                        onClick={withdrawEtherL2}
+                    >
+                        WITHDRAW (L2)
                     </Button>
                 </Group>
+
+                {cartesiTxId && (
+                    <Text size="sm" c="dimmed">
+                        L2 Transaction ID: {cartesiTxId}
+                    </Text>
+                )}
             </Stack>
         </form>
     );
