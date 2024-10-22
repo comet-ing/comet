@@ -15,7 +15,7 @@
         "codegen:graphql": "graphql-codegen"
     },
     "dependencies": {
-        "@cartesi/rollups": "2.0.0-rc.10",
+        "@cartesi/rollups": "^1.4.0",
         "@coinbase/wallet-sdk": "^4.0.4",
         "@jam/frames": "*",
         "@mantine/core": "^7.10.1",
@@ -41,7 +41,6 @@
         "wagmi": "^2.9.11"
     },
     "devDependencies": {
-        "@cartesi/rollups": "2.0.0-rc.10",
         "@graphql-codegen/cli": "^5",
         "@graphql-codegen/client-preset": "^4",
         "@graphql-codegen/import-types-preset": "^3.0.0",

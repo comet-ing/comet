@@ -10,7 +10,8 @@ import { decodeVoucher, isVoucherOwnedByAccount } from "./functions";
 import { Voucher, VoucherType } from "./types";
 
 const rollupsHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
-const graphqlURL = `${rollupsHost}/graphql`;
+const dappAddress = process.env.NEXT_PUBLIC_APP_ADDRESS;
+const graphqlURL = `${rollupsHost}/graphql/${dappAddress}`;
 
 export const voucherKeys = {
     base: ["vouchers"] as const,
