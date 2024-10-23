@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import request from "graphql-request";
 import { Address, zeroAddress } from "viem";
 import {
-    GetVouchersDocument,
-    GetVouchersQueryVariables,
+    VouchersDocument,
+    VouchersQueryVariables,
 } from "../../generated/graphql/rollups/operations";
 import { decodeVoucher, isVoucherOwnedByAccount } from "./functions";
 import { Voucher, VoucherType } from "./types";
@@ -46,9 +46,9 @@ export type UserVoucher = {
 const fetchVouchers = async (address?: Address) => {
     if (!address) return null;
 
-    const { vouchers } = await request<VoucherQuery, GetVouchersQueryVariables>(
+    const { vouchers } = await request<VoucherQuery, VouchersQueryVariables>(
         graphqlURL,
-        GetVouchersDocument,
+        VouchersDocument,
     );
 
     const edges = vouchers.edges ?? [];
