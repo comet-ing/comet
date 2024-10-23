@@ -31,12 +31,12 @@ $ ./cartesi-machine --network \
 ``` 
 You should now have your comet backend up and running. Follow [this](https://docs.google.com/document/d/1x8IhhDeZR818uBHXk-NQvZETXhFXbGDj0OLG2h3e9EE/edit?usp=sharing) detailed guide in case of issues. 
 
-6. Send inputs to the backend: Open another terminal tab and use `cast` command. Follow sample commands list to test the app:
+6. Send inputs to the backend via L1 InputBox contract: You can run the test script `test_comet_jam.sh` file to test basic functions. Alternatively, open another terminal tab and use `cast` commands listed below to test the app:
 
 **Create a new Comet Jam**
 ```
 INPUT=7b22616374696f6e223a20226a616d2e637265617465222c226e616d65223a20226d794a616d222c20226465736372697074696f6e22203a20226d79206a616d2064657363222c20226d696e745072696365223a202233222c20226d6178456e7472696573223a20332c202267656e65736973456e747279223a2022526f7365732061726520726564227d; \
-INPUT_BOX_ADDRESS=0x58Df21fE097d4bE5dCf61e01d9ea3f6B81c2E1dB; \ 
+INPUT_BOX_ADDRESS=0x593E5BCf894D6829Dd26D0810DA7F064406aebB6; \ 
 APPLICATION_ADDRESS=0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e; \
 cast send \
   --mnemonic "test test test test test test test test test test test junk" \
@@ -48,7 +48,7 @@ cast send \
 **Append to the Comet Jam**
 ```
 INPUT=7b22616374696f6e223a20226a616d2e617070656e64222c20226a616d4944223a20302c2022656e74727922203a2022536b6965732061726520626c7565227d; \
-INPUT_BOX_ADDRESS=0x58Df21fE097d4bE5dCf61e01d9ea3f6B81c2E1dB; \ 
+INPUT_BOX_ADDRESS=0x593E5BCf894D6829Dd26D0810DA7F064406aebB6; \ 
 APPLICATION_ADDRESS=0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e; \
 cast send \
   --mnemonic "test test test test test test test test test test test junk" \
