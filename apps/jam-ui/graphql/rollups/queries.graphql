@@ -1,27 +1,18 @@
-query getVouchers {
-    vouchers {
-        edges {
-            voucher: node {
-                index
-                input {
-                    index
-                }
-                destination
-                payload
-                proof {
-                    context
-                    validity {
-                        inputIndexWithinEpoch
-                        machineStateHash
-                        noticesEpochRootHash
-                        outputHashInOutputHashesSiblings
-                        outputHashesInEpochSiblings
-                        outputHashesRootHash
-                        outputIndexWithinInput
-                        vouchersEpochRootHash
-                    }
-                }
-            }
+query vouchers {
+  vouchers {
+    edges {
+      voucher: node {
+        index
+        input {
+          id
+          index
+          payload
         }
+        destination
+        value
+        payload
+        executed
+      }
     }
+  }
 }
