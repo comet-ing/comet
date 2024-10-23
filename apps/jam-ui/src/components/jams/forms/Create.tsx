@@ -13,18 +13,17 @@ import { useForm } from "@mantine/form";
 import { useDebouncedValue } from "@mantine/hooks";
 import { FC, useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
-import { stringToHex, PublicClient, toHex } from "viem";
+import { stringToHex } from "viem";
 import { useWaitForTransactionReceipt } from "wagmi";
 import {
     useSimulateInputBoxAddInput,
     useWriteInputBoxAddInput,
 } from "../../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
+import { useChainId } from "../../../hooks/useChainId";
+import { getWalletClient } from "../../../utils/chain";
 import { TransactionProgress } from "../../TransactionProgress";
 import { transactionState } from "../../TransactionState";
-import { getClient, getWalletClient } from "../../../utils/chain";
-import configFile from "../../../utils/config.json";
-const config: any = configFile;
 
 export interface Props {
     onSuccess?: () => void;
@@ -86,6 +85,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
     const [debouncedCanSubmit] = useDebouncedValue(canSubmit, 300);
 
     const [cartesiTxId, setCartesiTxId] = useState<string>("");
+    const chainId = useChainId();
 
     const l2DevNonceUrl = "http://localhost:8080/nonce";
     const l2DevSendTransactionUrl = "http://localhost:8080/submit";
@@ -94,7 +94,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
         domain: {
             name: "Cartesi",
             version: "0.1.0",
-            chainId: BigInt(0), // This will be set dynamically
+            chainId: BigInt(chainId),
             verifyingContract: "0x0000000000000000000000000000000000000000",
         } as const,
         types: {
@@ -116,17 +116,20 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
             app: "0x" as `0x${string}`,
             nonce: BigInt(0),
             data: "0x" as `0x${string}`,
-            max_gas_price: BigInt(10)
+            max_gas_price: BigInt(10),
         },
     };
 
     const fetchNonceL2 = async (user: any, application: any) => {
         const response = await fetch(l2DevNonceUrl, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify({ msg_sender: user, app_contract: application })
+            body: JSON.stringify({
+                msg_sender: user,
+                app_contract: application,
+            }),
         });
 
         const responseData = await response.json();
@@ -136,13 +139,13 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
     const submitTransactionL2 = async (fullBody: any) => {
         const body = JSON.stringify(fullBody);
         const response = await fetch(l2DevSendTransactionUrl, {
-            method: 'POST',
+            method: "POST",
             body,
-            headers: { 'Content-Type': 'application/json' }
+            headers: { "Content-Type": "application/json" },
         });
         if (!response.ok) {
             console.log("submit to L2 failed");
-            throw new Error("submit to L2 failed: " + await response.text());
+            throw new Error("submit to L2 failed: " + (await response.text()));
         } else {
             return response.json();
         }
@@ -150,26 +153,25 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
 
     const addTransactionL2 = async () => {
         console.log("adding TransactionL2");
-        //const chainId = await execute.chainId;
-        const chainId = "0x7a69"; // TODO: get dynamically
         console.log("chainId", chainId);
         if (chainId) {
             const walletClient = await getWalletClient(chainId);
             if (!walletClient) return;
             const [account] = await walletClient.requestAddresses();
+            console.log(`account: ${account}`);
             if (!account) return;
 
             // Create the payload with "action": "jam.create"
             const payloadData = {
                 action: "jam.create",
-                ...form.values
+                ...form.values,
             };
 
             const payload = stringToHex(JSON.stringify(payloadData));
             const app = address;
             const nonce = await fetchNonceL2(account, app);
-            
-            typedData.domain.chainId = BigInt(chainId);
+
+            // typedData.domain.chainId = BigInt(chainId); already set above
             typedData.message = {
                 app,
                 nonce,
@@ -179,16 +181,21 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
 
             try {
                 setCartesiTxId("");
-                const signature = await walletClient.signTypedData({ account, ...typedData });
-                const l2data = JSON.parse(JSON.stringify({
-                    typedData,
+                const signature = await walletClient.signTypedData({
                     account,
-                    signature,
-                }, (_, value) =>
-                    typeof value === 'bigint'
-                        ? Number(value)
-                        : value
-                ));
+                    ...typedData,
+                });
+                const l2data = JSON.parse(
+                    JSON.stringify(
+                        {
+                            typedData,
+                            account,
+                            signature,
+                        },
+                        (_, value) =>
+                            typeof value === "bigint" ? Number(value) : value,
+                    ),
+                );
                 const res = await submitTransactionL2(l2data);
                 setCartesiTxId(res.id);
                 if (onSuccess) onSuccess();
