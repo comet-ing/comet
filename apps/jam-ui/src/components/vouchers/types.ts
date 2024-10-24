@@ -1,4 +1,4 @@
-import { Address, Hash, Hex } from "viem";
+import { Hash, Hex } from "viem";
 
 export type VoucherType = "MINT" | "WITHDRAW";
 
@@ -19,9 +19,18 @@ export interface Proof {
 }
 
 export interface Voucher {
+    destination: Hex;
+    executed?: boolean;
     index: number;
-    input: { index: number };
-    destination: Address;
     payload: Hex;
-    proof?: Proof;
+    value: Hex;
+    input: {
+        id: string;
+        index: number;
+        payload: Hex;
+    };
+    proof: {
+        outputHashesSiblings: Hex[];
+        outputIndex: string;
+    };
 }

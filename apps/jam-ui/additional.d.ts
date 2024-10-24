@@ -19,6 +19,11 @@ declare namespace NodeJS {
         NEXT_PUBLIC_APP_ADDRESS: string;
 
         /**
+         * Contract address of the ERC1155 contract used on chain
+         */
+        NEXT_PUBLIC_ERC1155_ADDRESS: string;
+
+        /**
          * Contract address of the inputbox contract
          */
         INPUTBOX_CONTRACT_ADDRESS: string;

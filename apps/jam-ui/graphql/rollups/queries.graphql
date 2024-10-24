@@ -8,6 +8,10 @@ query vouchers {
           index
           payload
         }
+        proof {
+          outputIndex
+          outputHashesSiblings
+        }
         destination
         value
         payload
