@@ -11,58 +11,48 @@ import {
     Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { FC, useEffect } from "react";
 import { formatEther } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
-    useReadCartesiDAppWasVoucherExecuted,
-    useSimulateCartesiDAppExecuteVoucher,
-    useWriteCartesiDAppExecuteVoucher,
+    useSimulateCartesiDAppExecuteOutput,
+    useWriteCartesiDAppExecuteOutput,
 } from "../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../hooks/useApplicationAddress";
 import { CenteredLoaderBars } from "../CenteredLoaderBars";
 import { CometAlert } from "../CometAlert";
-import { dummyProof } from "./functions";
-import { UserVoucher, useGetUserVouchers } from "./queries";
+import { useGetUserVouchers, UserVoucher, voucherKeys } from "./queries";
 import { Voucher } from "./types";
+
+const isNotNullOrUndefined = (value: any) =>
+    value !== null && value !== undefined;
+const refetchUserVouchers = (queryClient: QueryClient) =>
+    queryClient.invalidateQueries({ queryKey: voucherKeys.lists() });
 
 const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
     const appAddress = useApplicationAddress();
+    const wasExecuted = voucher.executed;
+    const queryClient = useQueryClient();
 
-    const {
-        data: wasExecuted,
-        error: wasExecutedError,
-        isLoading: isCheckingVoucherStatus,
-        refetch: recheckVoucherStatus,
-    } = useReadCartesiDAppWasVoucherExecuted({
-        args: [BigInt(voucher.input.index), BigInt(voucher.index)],
-        address: appAddress,
-    });
-
-    const proof = voucher.proof ?? dummyProof;
-    const { validity } = proof;
-    const { inputIndexWithinEpoch, outputIndexWithinInput } = validity;
-
-    const prepare = useSimulateCartesiDAppExecuteVoucher({
+    const prepare = useSimulateCartesiDAppExecuteOutput({
         args: [
-            voucher.destination,
             voucher.payload,
             {
-                ...proof,
-                validity: {
-                    ...validity,
-                    inputIndexWithinEpoch: BigInt(inputIndexWithinEpoch),
-                    outputIndexWithinInput: BigInt(outputIndexWithinInput),
-                },
+                ...voucher.proof,
+                outputIndex: BigInt(voucher.proof.outputIndex),
             },
         ],
         address: appAddress,
         query: {
-            enabled: voucher.proof !== null && voucher.proof !== undefined,
+            enabled:
+                isNotNullOrUndefined(voucher.proof) &&
+                isNotNullOrUndefined(voucher.proof.outputHashesSiblings) &&
+                isNotNullOrUndefined(voucher.proof.outputIndex),
         },
     });
 
-    const execute = useWriteCartesiDAppExecuteVoucher();
+    const execute = useWriteCartesiDAppExecuteOutput();
     const wait = useWaitForTransactionReceipt({
         hash: execute.data,
     });
@@ -74,16 +64,17 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
                 message: "The voucher was executed.",
                 autoClose: 3000,
             });
-            recheckVoucherStatus();
-        }
-    }, [wait.isSuccess, recheckVoucherStatus]);
 
-    if (wasExecutedError !== null) {
-        return <Badge color="red">{wasExecutedError.message}</Badge>;
+            refetchUserVouchers(queryClient);
+        }
+    }, [wait.isSuccess, queryClient]);
+
+    if (prepare.error) {
+        return <Badge color="red">{prepare.error.message}</Badge>;
     }
 
-    if (isCheckingVoucherStatus) {
-        return <Badge color="orange">Checking execution status...</Badge>;
+    if (execute.error) {
+        return <Badge color="red">{execute.error.message}</Badge>;
     }
 
     if (wasExecuted) {

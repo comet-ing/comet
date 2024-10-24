@@ -2,13 +2,16 @@ import {
     Address,
     decodeFunctionData,
     getAddress,
+    Hex,
     isAddressEqual,
     parseAbi,
     zeroHash,
 } from "viem";
+import { outputsFactoryAbi } from "../../generated/wagmi-rollups";
 import { Proof, Voucher, VoucherType } from "./types";
 
 const appAddress = process.env.NEXT_PUBLIC_APP_ADDRESS;
+const erc1155Address = process.env.NEXT_PUBLIC_ERC1155_ADDRESS;
 
 const mintAbi = parseAbi(["function mint(address receiver, uint256 jamId)"]);
 
@@ -16,10 +19,26 @@ const withdrawEtherAbi = parseAbi([
     "function withdrawEther(address receiver, uint256 value)",
 ]);
 
-const decodeMintVoucher = (voucher: Voucher) =>
-    decodeFunctionData({ abi: mintAbi, data: voucher.payload });
-const decodeEtherWithdrawVoucher = (voucher: Voucher) =>
-    decodeFunctionData({ abi: withdrawEtherAbi, data: voucher.payload });
+const decodeOutput = (payload: Hex) =>
+    decodeFunctionData({ abi: outputsFactoryAbi, data: payload });
+
+const decodeMintVoucher = (voucher: Voucher) => {
+    const result = decodeOutput(voucher.payload);
+    const [_dest, _value, data] = result.args;
+    return decodeFunctionData({ abi: mintAbi, data: data as Hex });
+};
+const decodeEtherWithdrawVoucher = (voucher: Voucher) => {
+    const result = decodeOutput(voucher.payload);
+    const [dest, value, data] = result.args;
+
+    if (data === "0x")
+        return {
+            args: [dest, BigInt(value ?? "0")] as [Address, bigint],
+            functionName: "withdrawEther",
+        };
+
+    return decodeFunctionData({ abi: withdrawEtherAbi, data: data as Hex });
+};
 
 export const dummyProof: Proof = {
     context: "0x",
@@ -36,18 +55,18 @@ export const dummyProof: Proof = {
 };
 
 export function decodeVoucher(voucher: Voucher) {
-    const isWithdraw = isAddressEqual(
+    const isMint = isAddressEqual(
         getAddress(voucher.destination),
-        getAddress(appAddress),
+        getAddress(erc1155Address),
     );
 
-    const decoder = isWithdraw ? decodeEtherWithdrawVoucher : decodeMintVoucher;
+    const decoder = !isMint ? decodeEtherWithdrawVoucher : decodeMintVoucher;
 
     const { args } = decoder(voucher);
 
     const [receiver, value] = args;
 
-    const type: VoucherType = isWithdraw ? "WITHDRAW" : "MINT";
+    const type: VoucherType = !isMint ? "WITHDRAW" : "MINT";
 
     return {
         receiver,
