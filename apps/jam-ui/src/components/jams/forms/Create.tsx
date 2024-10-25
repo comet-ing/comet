@@ -10,20 +10,14 @@ import {
     Textarea,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useDebouncedValue } from "@mantine/hooks";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
 import { stringToHex } from "viem";
-import { useWaitForTransactionReceipt } from "wagmi";
-import {
-    useSimulateInputBoxAddInput,
-    useWriteInputBoxAddInput,
-} from "../../../generated/wagmi-rollups";
+import { useAccount } from "wagmi";
 import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
 import { useChainId } from "../../../hooks/useChainId";
-import { getWalletClient } from "../../../utils/chain";
-import { TransactionProgress } from "../../TransactionProgress";
-import { transactionState } from "../../TransactionState";
+import useEspressoSequencer from "../../../hooks/useEspressoSequencer";
+import { CenteredErrorMessage } from "../../CenteredErrorMessage";
 
 export interface Props {
     onSuccess?: () => void;
@@ -57,164 +51,24 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
             ),
         }),
     });
-
-    const address = useApplicationAddress();
-
-    const { hexInput } = form.getTransformedValues();
-
-    const prepare = useSimulateInputBoxAddInput({
-        args: [address, hexInput],
-        query: {
-            enabled: address !== null && hexInput !== null,
-        },
-    });
-
-    const execute = useWriteInputBoxAddInput();
-    const wait = useWaitForTransactionReceipt({
-        hash: execute.data,
-    });
-
-    const { disabled: createDisabled, loading: createLoading } =
-        transactionState(prepare, execute, wait, true);
-
-    const loading = execute.isPending || wait.isLoading || createLoading;
-    const canSubmit =
-        form.isValid() && prepare.error === null && !createDisabled;
-
-    const [debouncedLoading] = useDebouncedValue(loading, 300);
-    const [debouncedCanSubmit] = useDebouncedValue(canSubmit, 300);
-
-    const [cartesiTxId, setCartesiTxId] = useState<string>("");
     const chainId = useChainId();
-
-    const l2DevNonceUrl = "http://localhost:8080/nonce";
-    const l2DevSendTransactionUrl = "http://localhost:8080/submit";
-
-    const typedData = {
-        domain: {
-            name: "Cartesi",
-            version: "0.1.0",
-            chainId: BigInt(chainId),
-            verifyingContract: "0x0000000000000000000000000000000000000000",
-        } as const,
-        types: {
-            EIP712Domain: [
-                { name: "name", type: "string" },
-                { name: "version", type: "string" },
-                { name: "chainId", type: "uint256" },
-                { name: "verifyingContract", type: "address" },
-            ],
-            CartesiMessage: [
-                { name: "app", type: "address" },
-                { name: "nonce", type: "uint64" },
-                { name: "max_gas_price", type: "uint128" },
-                { name: "data", type: "bytes" },
-            ],
-        } as const,
-        primaryType: "CartesiMessage" as const,
-        message: {
-            app: "0x" as `0x${string}`,
-            nonce: BigInt(0),
-            data: "0x" as `0x${string}`,
-            max_gas_price: BigInt(10),
-        },
-    };
-
-    const fetchNonceL2 = async (user: any, application: any) => {
-        const response = await fetch(l2DevNonceUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                msg_sender: user,
-                app_contract: application,
-            }),
-        });
-
-        const responseData = await response.json();
-        return responseData.nonce;
-    };
-
-    const submitTransactionL2 = async (fullBody: any) => {
-        const body = JSON.stringify(fullBody);
-        const response = await fetch(l2DevSendTransactionUrl, {
-            method: "POST",
-            body,
-            headers: { "Content-Type": "application/json" },
-        });
-        if (!response.ok) {
-            console.log("submit to L2 failed");
-            throw new Error("submit to L2 failed: " + (await response.text()));
-        } else {
-            return response.json();
-        }
-    };
-
-    const addTransactionL2 = async () => {
-        console.log("adding TransactionL2");
-        console.log("chainId", chainId);
-        if (chainId) {
-            const walletClient = await getWalletClient(chainId);
-            if (!walletClient) return;
-            const [account] = await walletClient.requestAddresses();
-            console.log(`account: ${account}`);
-            if (!account) return;
-
-            // Create the payload with "action": "jam.create"
-            const payloadData = {
-                action: "jam.create",
-                ...form.values,
-            };
-
-            const payload = stringToHex(JSON.stringify(payloadData));
-            const app = address;
-            const nonce = await fetchNonceL2(account, app);
-
-            // typedData.domain.chainId = BigInt(chainId); already set above
-            typedData.message = {
-                app,
-                nonce,
-                data: payload,
-                max_gas_price: BigInt(10),
-            };
-
-            try {
-                setCartesiTxId("");
-                const signature = await walletClient.signTypedData({
-                    account,
-                    ...typedData,
-                });
-                const l2data = JSON.parse(
-                    JSON.stringify(
-                        {
-                            typedData,
-                            account,
-                            signature,
-                        },
-                        (_, value) =>
-                            typeof value === "bigint" ? Number(value) : value,
-                    ),
-                );
-                const res = await submitTransactionL2(l2data);
-                setCartesiTxId(res.id);
-                if (onSuccess) onSuccess();
-            } catch (e) {
-                console.error(`Error in L2 transaction: ${e}`);
-            }
-        }
-    };
+    const { address } = useAccount();
+    const appAddress = useApplicationAddress();
+    const { status, error, submitTransaction, reset } = useEspressoSequencer({
+        account: address,
+        appAddress,
+        chainId,
+    });
 
     useEffect(() => {
-        if (wait.isSuccess) {
+        if (status === "success") {
+            reset();
             form.reset();
-            execute.reset();
-
             if (onSuccess !== undefined && onSuccess instanceof Function) {
                 onSuccess();
             }
         }
-    }, [wait.isSuccess, onSuccess, form, execute]);
+    }, [status, onSuccess, form, reset]);
 
     return (
         <form id="create-jam-form">
@@ -272,51 +126,28 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                     {...form.getInputProps("genesisEntry")}
                 />
 
-                <Collapse
-                    in={
-                        execute.isPending ||
-                        wait.isLoading ||
-                        execute.isSuccess ||
-                        execute.isError
-                    }
-                >
-                    <TransactionProgress
-                        prepare={prepare}
-                        execute={execute}
-                        wait={wait}
-                        confirmationMessage="Comet created successfully!"
-                        defaultErrorMessage={execute.error?.message}
+                <Collapse in={status === "error"}>
+                    <CenteredErrorMessage
+                        message={error?.message ?? "Something went wrong"}
                     />
                 </Collapse>
 
                 <Group justify="right">
                     <Button
-                        variant="filled"
-                        disabled={!debouncedCanSubmit}
-                        leftSection={<FaCheck />}
-                        loading={debouncedLoading}
-                        onClick={() =>
-                            execute.writeContract(prepare.data!.request)
-                        }
-                    >
-                        Create (L1)
-                    </Button>
-                    <Button
                         variant="outline"
                         disabled={!form.isValid()}
                         leftSection={<FaCheck />}
-                        loading={debouncedLoading}
-                        onClick={addTransactionL2}
+                        loading={status === "loading"}
+                        onClick={() =>
+                            submitTransaction({
+                                action: "jam.create",
+                                ...form.values,
+                            })
+                        }
                     >
                         Create (L2)
                     </Button>
                 </Group>
-
-                {cartesiTxId && (
-                    <Text size="sm" c="dimmed">
-                        L2 Transaction ID: {cartesiTxId}
-                    </Text>
-                )}
             </Stack>
         </form>
     );

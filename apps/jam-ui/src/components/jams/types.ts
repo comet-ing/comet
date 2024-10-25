@@ -24,3 +24,21 @@ export interface Jam {
     description: string;
     entries: JamEntry[];
 }
+
+export type PayloadDataAction = "jam.create" | "jam.append";
+export interface CreatePayloadData {
+    action: "jam.create";
+    name: string;
+    description: string;
+    mintPrice: number;
+    maxEntries: number;
+    genesisEntry: string;
+}
+
+export interface AppendPayloadData {
+    action: "jam.append";
+    jamID: number;
+    entry: string;
+}
+
+export type PayloadData = CreatePayloadData | AppendPayloadData;

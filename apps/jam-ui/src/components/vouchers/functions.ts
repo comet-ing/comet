@@ -10,7 +10,6 @@ import {
 import { outputsFactoryAbi } from "../../generated/wagmi-rollups";
 import { Proof, Voucher, VoucherType } from "./types";
 
-const appAddress = process.env.NEXT_PUBLIC_APP_ADDRESS;
 const erc1155Address = process.env.NEXT_PUBLIC_ERC1155_ADDRESS;
 
 const mintAbi = parseAbi(["function mint(address receiver, uint256 jamId)"]);
