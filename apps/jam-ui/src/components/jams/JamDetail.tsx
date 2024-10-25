@@ -113,9 +113,11 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
         });
         closeModal();
 
-        queryClient.invalidateQueries({
-            queryKey: jamKeys.base,
-        });
+        setTimeout(() => {
+            queryClient.invalidateQueries({
+                queryKey: jamKeys.base,
+            });
+        }, 1000);
     }, [closeModal, queryClient]);
 
     const { data, error, isLoading } = useFindJam(jamId);

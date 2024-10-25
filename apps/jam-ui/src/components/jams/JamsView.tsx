@@ -39,9 +39,11 @@ export default function JamsView() {
         });
         closeModal();
 
-        queryClient.invalidateQueries({
-            queryKey: jamKeys.lists(),
-        });
+        setTimeout(() => {
+            queryClient.invalidateQueries({
+                queryKey: jamKeys.lists(),
+            });
+        }, 1000);
     }, [closeModal, queryClient]);
 
     const { data, error, isLoading } = useListJams(filter);
