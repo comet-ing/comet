@@ -1,6 +1,6 @@
 import { hexToString } from "viem";
 import { InspectResponseBody, Report } from "../../utils/rollups.types";
-import { Jam, JamListFilter, JamStats } from "./types";
+import { Jam, JamListFilter, JamLite, JamStats } from "./types";
 
 const rollupHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
 const dappAddress = process.env.NEXT_PUBLIC_APP_ADDRESS;
@@ -40,7 +40,7 @@ export const fetchJams = async (filter: JamListFilter = "all") => {
     if (data.status === "Exception")
         return createError(hexToString(data.exception_payload));
 
-    const result = parseReport<Jam[]>(data.reports[0], []);
+    const result = parseReport<JamLite[]>(data.reports[0], []);
 
     return result;
 };
