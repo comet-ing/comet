@@ -29,7 +29,7 @@ const CollabGroup: FC<CollabGroupProp> = ({ jam }) => {
                 Collaborators:
             </Text>
             <Avatar.Group>
-                {jam.entries.map(({ address }, idx) => (
+                {jam.submittedAddresses.map(( address , idx) => (
                     <CustomAvatar key={idx} address={address} size={30} />
                 ))}
             </Avatar.Group>
@@ -67,7 +67,7 @@ export const ListJams: FC<ListProps> = ({ jams }) => {
                             <Group>
                                 <Text size="sm" c="dimmed">
                                     Entries{" "}
-                                    {`${jam.entries.length}/${jam.maxEntries}`}
+                                    { `${jam.entryCount}/${jam.maxEntries}` }
                                 </Text>
                             </Group>
                         </Group>
