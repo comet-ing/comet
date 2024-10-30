@@ -13,7 +13,10 @@ export interface JamEntry {
     address: Hex;
     text: string;
 }
-
+/**
+ * The real representation of a Jam when getting its details.
+ * Usually is 1 to 1.
+ */
 export interface Jam {
     id: number;
     maxEntries: number;
@@ -22,6 +25,14 @@ export interface Jam {
     open: boolean;
     creatorAddress: Hex;
     description: string;
+    entries: JamEntry[];
+}
+
+/**
+ * JamLite represents the response when listing the Jams as it will not return
+ * all the text that is part of a jam avoid unnecessary bytes into the wire.
+ */
+export interface JamLite extends Omit<Jam, "entries"> {
     entryCount: number;
     submittedAddresses: Hex[];
 }

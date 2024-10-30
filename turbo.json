@@ -9,7 +9,8 @@
         "NEXT_PUBLIC_PLAUSIBLE_DOMAIN",
         "INPUTBOX_CONTRACT_ADDRESS",
         "NEYNAR_ONCHAIN_KIT_API_KEY",
-        "WEB_APP_BASE_URL"
+        "WEB_APP_BASE_URL",
+        "NEXT_PUBLIC_ERC1155_ADDRESS"
     ],
     "pipeline": {
         "build": {

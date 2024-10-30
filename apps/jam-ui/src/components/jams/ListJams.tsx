@@ -12,14 +12,14 @@ import {
 import Link from "next/link";
 import { FC } from "react";
 import { CustomAvatar } from "./CustomAvatar";
-import { Jam } from "./types";
+import { JamLite } from "./types";
 
 type ListProps = {
-    jams: Jam[];
+    jams: JamLite[];
 };
 
 type CollabGroupProp = {
-    jam: Jam;
+    jam: JamLite;
 };
 
 const CollabGroup: FC<CollabGroupProp> = ({ jam }) => {
@@ -29,7 +29,7 @@ const CollabGroup: FC<CollabGroupProp> = ({ jam }) => {
                 Collaborators:
             </Text>
             <Avatar.Group>
-                {jam.submittedAddresses.map(( address , idx) => (
+                {jam.submittedAddresses.map((address, idx) => (
                     <CustomAvatar key={idx} address={address} size={30} />
                 ))}
             </Avatar.Group>
@@ -67,7 +67,7 @@ export const ListJams: FC<ListProps> = ({ jams }) => {
                             <Group>
                                 <Text size="sm" c="dimmed">
                                     Entries{" "}
-                                    { `${jam.entryCount}/${jam.maxEntries}` }
+                                    {`${jam.entryCount}/${jam.maxEntries}`}
                                 </Text>
                             </Group>
                         </Group>
