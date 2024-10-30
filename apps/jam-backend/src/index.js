@@ -225,11 +225,11 @@ import {
   
         switch (payloadArr[0]) {
             case "alljams":
-                const allJams = Jam.allJams;
+                const lightJams = Jam.getAllJamsLite();
                 try {
-                    await app.createReport({ payload: stringToHex(JSON.stringify(allJams)) });
+                    await app.createReport({ payload: stringToHex(JSON.stringify(lightJams)) });
                 } catch (error) {
-                    console.error("Error stringifying allJams:", error);
+                    console.error("Error stringifying lightJams:", error);
                     await app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
                 }
                 break;
@@ -239,11 +239,11 @@ import {
                 await app.createReport({ payload: stringToHex(JSON.stringify(jamByID)) });
                 break;
             case "openjams":
-                const openJams = Jam.getJamsByStatus("open");
+                const openJams = Jam.getJamsByStatusLite("open");
                 await app.createReport({ payload: stringToHex(JSON.stringify(openJams)) });
                 break;
             case "closedjams":
-                const closedJams = Jam.getJamsByStatus("closed");
+                const closedJams = Jam.getJamsByStatusLite("closed");
                 await app.createReport({ payload: stringToHex(JSON.stringify(closedJams)) });
                 break;
             case "user":

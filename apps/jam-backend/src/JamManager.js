@@ -178,4 +178,41 @@ export default class Jam {
             return { jamID, ...info };
         });
     }
+
+    static getAllJamsLite() {
+        return Jam.allJams.map(jam => ({
+            id: jam.id,
+            name: jam.name,
+            description: jam.description,
+            mintPrice: jam.mintPrice,
+            maxEntries: jam.maxEntries,
+            creatorAddress: jam.creatorAddress,
+            open: jam.open,
+            entryCount: jam.entries.length,
+            submittedAddresses: Array.from(jam.submittedAddresses)
+        }));
+    }
+
+    static getJamsByStatusLite = (status) => {
+        if (status !== "open" && status !== "closed") {
+            throw new Error(
+                'Invalid status. Must be either "open" or "closed".',
+            );
+        }
+        const filteredJams = status === "open" 
+            ? Jam.allJams.filter((jam) => jam.open === true)
+            : Jam.allJams.filter((jam) => jam.open === false);
+
+        return filteredJams.map(jam => ({
+            id: jam.id,
+            name: jam.name,
+            description: jam.description,
+            mintPrice: jam.mintPrice,
+            maxEntries: jam.maxEntries,
+            creatorAddress: jam.creatorAddress,
+            open: jam.open,
+            entryCount: jam.entries.length,
+            submittedAddresses: Array.from(jam.submittedAddresses)
+        }));
+    };
 }
