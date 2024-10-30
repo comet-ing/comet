@@ -22,7 +22,8 @@ export interface Jam {
     open: boolean;
     creatorAddress: Hex;
     description: string;
-    entries: JamEntry[];
+    entryCount: number;
+    submittedAddresses: Hex[];
 }
 
 export type PayloadDataAction = "jam.create" | "jam.append";
