@@ -174,17 +174,6 @@ import {
                         Jam.appendToJamByID(input.jamID, sender, input.entry);
                         console.log("Appended to JamID: ", input.jamID);
                         
-                        // Create and send the notice
-                        /*
-                        const notice = {
-                            "__push_notification__": true,
-                            "type": "instant",
-                            "message": `New contribution recorded in comet id #${jam.id}.`,
-                            "target": "*"
-                        };
-                        
-                        
-                        app.createNotice({ payload: stringToHex(JSON.stringify(notice)) }); */
                     } catch (error) {
                         console.error("Error in jam.append:", error);
                         await app.createReport({ payload: stringToHex(`Error: ${error.message}`) });
@@ -197,14 +186,12 @@ import {
                     try {
                         const voucher = wallet.withdrawEther(sender, amountToWithdraw);
                         console.log("Voucher for eth withdrawal: ", voucher);
-                        
-                        // Ensure the value is a 32-byte hex string
-                        const paddedValue = padHex(toHex(voucher.value), { size: 32 });
+                        const paddedValue = padHex(voucher.value, { size: 32 });
                         
                         await app.createVoucher({
                             destination: voucher.destination,
-                            payload: voucher.payload,
-                            value: paddedValue
+                            value: paddedValue,
+                            payload: voucher.payload
                         });
                     } catch (error) {
                         console.error("Error withdrawing ether:", error);
