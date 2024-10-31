@@ -12,6 +12,7 @@ export interface JamStats {
 export interface JamEntry {
     address: Hex;
     text: string;
+    timestamp: number;
 }
 /**
  * The real representation of a Jam when getting its details.
@@ -23,6 +24,7 @@ export interface Jam {
     mintPrice: number;
     name: string;
     open: boolean;
+    timestamp: number;
     creatorAddress: Hex;
     description: string;
     entries: JamEntry[];
