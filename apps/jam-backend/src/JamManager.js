@@ -12,16 +12,20 @@ export default class Jam {
         maxEntries,
         genesisEntry,
         contributor,
+        timestamp,
     ) {
         this.id = Jam.jamIDCounter++;
         this.name = name;
         this.description = description;
         this.mintPrice = mintPrice;
         this.maxEntries = maxEntries;
-        this.entries = [{ text: genesisEntry, address: contributor }];
+        this.entries = [
+            { text: genesisEntry, address: contributor, timestamp },
+        ];
         this.creatorAddress = contributor;
         this.submittedAddresses = new Set([contributor]);
         this.open = true;
+        this.timestamp = timestamp;
         Jam.allJams.push(this);
 
         Jam.jamStats.set(this.id, {
@@ -36,7 +40,7 @@ export default class Jam {
         console.log(Jam.allJams);
     };
 
-    appendToJam = (address, text) => {
+    appendToJam = (address, text, timestamp) => {
         if (!this.open) {
             throw new Error("This jam is closed for new entries.");
         }
@@ -51,7 +55,7 @@ export default class Jam {
                 "This jam has reached the maximum number of entries.",
             );
         }
-        this.entries.push({ text, address });
+        this.entries.push({ text, address, timestamp });
         this.submittedAddresses.add(address);
 
         // Update the overall jam score
@@ -62,12 +66,12 @@ export default class Jam {
         }
     };
 
-    static appendToJamByID = (jamID, address, text) => {
+    static appendToJamByID = (jamID, address, text, timestamp) => {
         const jam = Jam.allJams.find((jam) => jam.id === jamID);
         if (!jam) {
             throw new Error(`Jam with ID ${jamID} not found.`);
         }
-        jam.appendToJam(address, text);
+        jam.appendToJam(address, text, timestamp);
     };
 
     static getJamByID = (jamID) => {
@@ -180,17 +184,22 @@ export default class Jam {
     }
 
     static getAllJamsLite() {
-        return Jam.allJams.map(jam => ({
+        return Jam.allJams.map(Jam.#mapToJamLite);
+    }
+
+    static #mapToJamLite(jam) {
+        return {
             id: jam.id,
             name: jam.name,
             description: jam.description,
             mintPrice: jam.mintPrice,
             maxEntries: jam.maxEntries,
             creatorAddress: jam.creatorAddress,
+            timestamp: jam.timestamp,
             open: jam.open,
             entryCount: jam.entries.length,
-            submittedAddresses: Array.from(jam.submittedAddresses)
-        }));
+            submittedAddresses: Array.from(jam.submittedAddresses),
+        };
     }
 
     static getJamsByStatusLite = (status) => {
@@ -199,20 +208,11 @@ export default class Jam {
                 'Invalid status. Must be either "open" or "closed".',
             );
         }
-        const filteredJams = status === "open" 
-            ? Jam.allJams.filter((jam) => jam.open === true)
-            : Jam.allJams.filter((jam) => jam.open === false);
+        const filteredJams =
+            status === "open"
+                ? Jam.allJams.filter((jam) => jam.open === true)
+                : Jam.allJams.filter((jam) => jam.open === false);
 
-        return filteredJams.map(jam => ({
-            id: jam.id,
-            name: jam.name,
-            description: jam.description,
-            mintPrice: jam.mintPrice,
-            maxEntries: jam.maxEntries,
-            creatorAddress: jam.creatorAddress,
-            open: jam.open,
-            entryCount: jam.entries.length,
-            submittedAddresses: Array.from(jam.submittedAddresses)
-        }));
+        return filteredJams.map(Jam.#mapToJamLite);
     };
 }
