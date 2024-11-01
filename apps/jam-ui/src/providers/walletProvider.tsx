@@ -21,13 +21,12 @@ import Image from "next/image";
 import { ReactNode } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { createConfig, fallback, http, WagmiProvider } from "wagmi";
-import { base, baseSepolia, foundry } from "wagmi/chains";
+import { foundry, sepolia } from "wagmi/chains";
 
 // select chain based on env var
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");
 const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
-const chain =
-    [foundry, base, baseSepolia].find((c) => c.id == chainId) || foundry;
+const chain = [foundry, sepolia].find((c) => c.id == chainId) || foundry;
 
 const projectId = "37a6d6f11d78a12ca814a377a53b5b55";
 
@@ -78,8 +77,7 @@ const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
 };
 
 const [defaultFoundryRpcUrl] = foundry.rpcUrls.default.http;
-const [defaultBaseSepoliaRpcUrl] = baseSepolia.rpcUrls.default.http;
-const [defaultBaseRpcUrl] = base.rpcUrls.default.http;
+const [defaultSepoliaRpcUrl] = sepolia.rpcUrls.default.http;
 
 const wagmiConfig = createConfig({
     ssr: true,
@@ -88,22 +86,12 @@ const wagmiConfig = createConfig({
     multiInjectedProviderDiscovery: false,
     transports: {
         [foundry.id]: http(defaultFoundryRpcUrl),
-        [base.id]: alchemyApiKey
+        [sepolia.id]: alchemyApiKey
             ? fallback([
-                  http(
-                      `https://base-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
-                  ),
-                  http(defaultBaseRpcUrl),
+                  http(`https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
+                  http(defaultSepoliaRpcUrl),
               ])
-            : http(defaultBaseRpcUrl),
-        [baseSepolia.id]: alchemyApiKey
-            ? fallback([
-                  http(
-                      `https://base-sepolia.g.alchemy.com/v2/${alchemyApiKey}`,
-                  ),
-                  http(defaultBaseSepoliaRpcUrl),
-              ])
-            : http(defaultBaseSepoliaRpcUrl),
+            : http(defaultSepoliaRpcUrl),
     },
 });
 
