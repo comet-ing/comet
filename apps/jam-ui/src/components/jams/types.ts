@@ -55,4 +55,12 @@ export interface AppendPayloadData {
     entry: string;
 }
 
-export type PayloadData = CreatePayloadData | AppendPayloadData;
+export interface WithdrawPayloadData {
+    action: "eth.withdraw";
+    amount: string;
+}
+
+export type PayloadData =
+    | CreatePayloadData
+    | AppendPayloadData
+    | WithdrawPayloadData;

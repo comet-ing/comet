@@ -42,9 +42,11 @@ export const EthBalance: FC = () => {
 
         closeModal();
         if (address) {
-            queryClient.invalidateQueries({
-                queryKey: balanceKeys.detail(address),
-            });
+            setTimeout(() => {
+                queryClient.invalidateQueries({
+                    queryKey: balanceKeys.detail(address),
+                });
+            }, 1000);
         }
     }, [closeModal, queryClient, address]);
 
