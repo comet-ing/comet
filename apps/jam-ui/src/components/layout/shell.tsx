@@ -42,7 +42,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
             header={themeDefaultProps.header}
             navbar={{
                 ...themeDefaultProps?.navbar,
-                width: 180,
+                width: 233,
                 collapsed: {
                     mobile: !opened,
                 },
@@ -86,31 +86,31 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                 </Group>
             </AppShell.Header>
             <AppShell.Navbar py="md" px={4} data-testid="navbar">
-                <Stack px={13} h="100%">
+                <Stack px={13} h="100%" justify="center">
                     <NavLink
                         component={Link}
-                        label="Home"
+                        label={<Text size="lg">Home</Text>}
                         href="/"
-                        leftSection={<FaHome />}
+                        leftSection={<FaHome size={21} />}
                         onClick={closeMobileMenu}
                         data-testid="home-link"
                     />
 
                     <NavLink
                         component={Link}
-                        label="Comets"
+                        label={<Text size="lg">Comets</Text>}
                         onClick={closeMobileMenu}
                         href="/jams"
-                        leftSection={<FaPencilAlt />}
+                        leftSection={<FaPencilAlt size={21} />}
                         data-testid="jams-link"
                     />
 
                     <NavLink
                         component={Link}
-                        label="Collections"
+                        label={<Text size="lg">Collections</Text>}
                         onClick={closeMobileMenu}
                         href="/collections"
-                        leftSection={<FaTags />}
+                        leftSection={<FaTags size={21} />}
                         data-testid="jams-link"
                     />
 
@@ -132,7 +132,7 @@ const Shell: FC<{ children: ReactNode }> = ({ children }) => {
                                 <Text c="dimmed" fw="bold" size="sm">
                                     Your
                                 </Text>
-                                <Stack pl="sm">
+                                <Stack pl="xs">
                                     <EthBalance />
                                 </Stack>
                             </Stack>

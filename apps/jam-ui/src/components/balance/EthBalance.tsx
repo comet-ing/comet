@@ -59,10 +59,9 @@ export const EthBalance: FC = () => {
     return (
         <Stack>
             <Group justify="space-between">
-                <Text c="dimmed">Balance</Text>
-                <Text>{formatEther(data)} </Text>
+                <Text c="dimmed">App balance</Text>
+                <Text>{formatEther(data)} ETH</Text>
             </Group>
-
             <Transition
                 mounted={hasBalance}
                 transition="scale-x"
