@@ -211,7 +211,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                     break;
                 case "eth.withdraw":
                     console.log("Withdraw ether");
-                    const amountToWithdraw = parseEther(String(input.amount));
+                    const amountToWithdraw = BigInt(input.amount);
                     try {
                         const voucher = wallet.withdrawEther(
                             sender,
