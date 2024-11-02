@@ -1,7 +1,10 @@
 "use client";
 import {
+    Button,
     Card,
     Center,
+    Container,
+    Group,
     NumberFormatter,
     Paper,
     SimpleGrid,
@@ -10,7 +13,10 @@ import {
     Title,
     useMantineColorScheme,
 } from "@mantine/core";
+
+import Link from "next/link";
 import { FC } from "react";
+import { FaEye } from "react-icons/fa";
 import { CenteredLoaderBars } from "../CenteredLoaderBars";
 import { CometAlert } from "../CometAlert";
 import { useListJamsStats } from "./queries";
@@ -51,13 +57,28 @@ export const JamsStatsView: FC = () => {
         );
 
     return (
-        <SimpleGrid cols={{ base: 1, md: 2 }}>
+        <Container
+            fluid
+            w={{ base: "95%", sm: "85%", lg: "75%" }}
+            px={{ base: 3, sm: 8 }}
+        >
             {data.map((stats) => (
-                <Paper key={stats.jamID} p="xl" bg="haiti" radius="lg">
+                <Paper key={stats.jamID} p="xl" radius="sm" my="sm" bg="haiti">
                     <Stack>
-                        <Title order={3} c={cardTitleColor}>
-                            {stats.name}
-                        </Title>
+                        <Group justify="space-between">
+                            <Title order={3} c={cardTitleColor}>
+                                {stats.name}
+                            </Title>
+                            <Button
+                                variant="subtle"
+                                component={Link}
+                                href={`jams/${stats.jamID}`}
+                                rightSection={<FaEye size={18} />}
+                                c={cardTitleColor}
+                            >
+                                <Title order={4}>View</Title>
+                            </Button>
+                        </Group>
 
                         <SimpleGrid cols={{ base: 1, md: 2, xl: 3 }}>
                             <Stats title="Score" value={stats.score} />
@@ -76,7 +97,7 @@ export const JamsStatsView: FC = () => {
                     </Stack>
                 </Paper>
             ))}
-        </SimpleGrid>
+        </Container>
     );
 };
 
