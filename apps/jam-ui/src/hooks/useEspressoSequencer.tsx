@@ -180,7 +180,7 @@ const useEspressoSequencer = ({
                     setError(error);
                 });
         },
-        [account, chainId],
+        [account, chainId, appAddress],
     );
 
     return {
