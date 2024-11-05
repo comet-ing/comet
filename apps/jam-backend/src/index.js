@@ -38,7 +38,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
     try {
         console.log("Advance Request");
         const sender = getAddress(metadata.msg_sender);
-
+        // TODO: add a mint condition when user already has in-app balance i.e. minting via L2 msg.
         // ether deposit handling
         if (sender === ether_portal_address) {
             console.log("Ether deposit request");
@@ -67,7 +67,13 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                 return "accept";
             }
             console.debug("input data is", input_data);
-            var etherDepositExecJSON = JSON.parse(hexToString(input_data[2]));
+            let etherDepositExecJSON;
+            try {
+                etherDepositExecJSON = JSON.parse(hexToString(input_data[2]));
+            } catch (error) {
+                console.warn("Invalid JSON in deposit payload. Treating as simple deposit.");
+                return "accept";
+            }
 
             if (
                 etherDepositExecJSON.action === "jam.mint" &&
@@ -141,6 +147,9 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                     });
                 }
 
+                return "accept";
+            } else {
+                console.warn("Either action for mint or NFT address not set. Treating as simple deposit.");
                 return "accept";
             }
         }
