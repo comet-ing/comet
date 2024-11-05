@@ -4,11 +4,10 @@ import {
     Card,
     Center,
     Container,
+    Flex,
+    getGradient,
     Group,
     NumberFormatter,
-    Paper,
-    SimpleGrid,
-    Stack,
     Text,
     Title,
     useMantineColorScheme,
@@ -17,6 +16,7 @@ import {
 import Link from "next/link";
 import { FC } from "react";
 import { FaEye } from "react-icons/fa";
+import { theme } from "../../providers/theme";
 import { CenteredLoaderBars } from "../CenteredLoaderBars";
 import { CometAlert } from "../CometAlert";
 import { useListJamsStats } from "./queries";
@@ -63,63 +63,80 @@ export const JamsStatsView: FC = () => {
             px={{ base: 3, sm: 8 }}
         >
             {data.map((stats) => (
-                <Paper key={stats.jamID} p="xl" radius="sm" my="sm" bg="haiti">
-                    <Stack>
-                        <Group justify="space-between">
-                            <Title order={3} c={cardTitleColor}>
-                                {stats.name}
-                            </Title>
-                            <Button
-                                variant="subtle"
-                                component={Link}
-                                href={`jams/${stats.jamID}`}
-                                rightSection={<FaEye size={18} />}
-                                c={cardTitleColor}
-                            >
-                                <Title order={4}>View</Title>
-                            </Button>
-                        </Group>
+                <>
+                    <Card
+                        key={`card-${stats.jamID}`}
+                        p="xl"
+                        radius="sm"
+                        my="sm"
+                        maw="960px"
+                    >
+                        <Card.Section inheritPadding py="xs">
+                            <Group justify="space-between">
+                                <Title order={3}>{stats.name}</Title>
+                                <Button
+                                    variant="subtle"
+                                    component={Link}
+                                    href={`jams/${stats.jamID}`}
+                                    rightSection={<FaEye size={18} />}
+                                >
+                                    <Title order={4}>View</Title>
+                                </Button>
+                            </Group>
+                        </Card.Section>
 
-                        <SimpleGrid cols={{ base: 1, md: 2, xl: 3 }}>
-                            <Stats title="Score" value={stats.score} />
+                        <Flex
+                            justify={{
+                                base: "center",
+                                md: "space-between",
+                            }}
+                            wrap={{ base: "wrap", md: "nowrap" }}
+                            gap="sm"
+                        >
+                            <CardStats title="Score" value={stats.score} />
 
-                            <Stats
+                            <CardStats
                                 title="Mints"
                                 value={stats.numTotalMints.toString()}
                             />
 
-                            <Stats
+                            <CardStats
                                 title="Total Minted"
                                 value={stats.totalMintAmount}
-                                suffix=" ETH"
+                                suffix=" eth"
                             />
-                        </SimpleGrid>
-                    </Stack>
-                </Paper>
+                        </Flex>
+                    </Card>
+                </>
             ))}
         </Container>
     );
 };
 
-const Stats: FC<{
+const CardStats: FC<{
     title: string;
     value: string;
     suffix?: string;
     prefix?: string;
-}> = ({ title, value, suffix, prefix }) => {
+}> = ({ title, value, prefix, suffix }) => {
+    const { colorScheme } = useMantineColorScheme();
+    const gradConfig =
+        colorScheme === "dark"
+            ? { deg: 120, from: "haiti.9", to: "haiti.3" }
+            : { deg: 90, from: "haiti.1", to: "haiti.5" };
+    const gradient = getGradient(gradConfig, theme);
+
     return (
-        <Card radius="lg">
-            <Stack align="center">
-                <Text fw="500">{title}</Text>
-                <Text>
-                    <NumberFormatter
-                        suffix={suffix}
-                        prefix={prefix}
-                        value={value}
-                        thousandSeparator
-                    />
-                </Text>
-            </Stack>
+        <Card bg={gradient} miw={{ base: "100%", md: "200px" }}>
+            <Title>
+                <NumberFormatter
+                    suffix={suffix}
+                    prefix={prefix}
+                    value={value}
+                    thousandSeparator
+                />
+            </Title>
+            <Text>{title}</Text>
         </Card>
     );
 };
