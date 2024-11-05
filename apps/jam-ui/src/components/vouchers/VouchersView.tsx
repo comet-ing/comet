@@ -6,13 +6,15 @@ import {
     Card,
     Center,
     Group,
+    NumberFormatter,
     SimpleGrid,
     Stack,
     Text,
+    Title,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { formatEther } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
@@ -22,8 +24,9 @@ import {
 import { useApplicationAddress } from "../../hooks/useApplicationAddress";
 import { CenteredLoaderBars } from "../CenteredLoaderBars";
 import { CometAlert } from "../CometAlert";
+import { useFindJam } from "../jams/queries";
 import { useGetUserVouchers, UserVoucher, voucherKeys } from "./queries";
-import { Voucher } from "./types";
+import { Voucher, VoucherType } from "./types";
 
 const isNotNullOrUndefined = (value: any) =>
     value !== null && value !== undefined;
@@ -70,30 +73,51 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
     }, [wait.isSuccess, queryClient]);
 
     if (prepare.error) {
-        return <Badge color="red">{prepare.error.message}</Badge>;
+        return (
+            <Badge color="red" radius={0}>
+                {prepare.error.message}
+            </Badge>
+        );
     }
 
     if (execute.error) {
-        return <Badge color="red">{execute.error.message}</Badge>;
+        return (
+            <Badge color="red" radius={0}>
+                {execute.error.message}
+            </Badge>
+        );
     }
 
     if (wasExecuted) {
-        return <Badge color="green">Executed!</Badge>;
+        return (
+            <Badge color="green" radius={0}>
+                Executed!
+            </Badge>
+        );
     }
 
     if (voucher.proof === null) {
-        return <Badge color="orange">Waiting for proof...</Badge>;
+        return (
+            <Badge color="orange" radius={0}>
+                Waiting for proof...
+            </Badge>
+        );
     }
 
     if (execute === undefined) {
-        return <Badge color="orange">Preparing transaction...</Badge>;
+        return (
+            <Badge color="orange" radius={0}>
+                Preparing transaction...
+            </Badge>
+        );
     }
 
     return (
         <Button
-            size="compact-sm"
+            h="100%"
             loading={execute.isPending || wait.isLoading}
             onClick={() => execute.writeContract(prepare.data!.request)}
+            radius={0}
         >
             Execute
         </Button>
@@ -105,9 +129,19 @@ interface Props {
 }
 
 const MintVoucher: FC<Props> = ({ userVoucher }) => {
+    const { data, isLoading, error } = useFindJam(parseInt(userVoucher.value));
+    const text = isLoading || error ? userVoucher.value : data?.name;
+
     return (
-        <Group justify="center">
-            <Text>Mint for Comet {userVoucher.value}</Text>
+        <Group justify="space-between" wrap="nowrap">
+            <Stack gap={0} p="sm" w="60%">
+                <Title style={{ textOverflow: "ellipsis", overflow: "hidden" }}>
+                    {text}
+                </Title>
+                <Badge bg="kidnapper">
+                    <Text size="xs">Mint</Text>
+                </Badge>
+            </Stack>
             <ExecuteButton voucher={userVoucher.voucher} />
         </Group>
     );
@@ -115,8 +149,19 @@ const MintVoucher: FC<Props> = ({ userVoucher }) => {
 
 const WithdrawVoucher: FC<Props> = ({ userVoucher }) => {
     return (
-        <Group justify="center">
-            <Text>Withdraw {formatEther(BigInt(userVoucher.value))}</Text>
+        <Group justify="space-between" wrap="nowrap">
+            <Stack gap={0} p="sm">
+                <Title>
+                    <NumberFormatter
+                        value={formatEther(BigInt(userVoucher.value))}
+                        thousandSeparator
+                        suffix=" eth"
+                    />
+                </Title>
+                <Badge m={0} variant="light">
+                    <Text size="xs">Withdraw</Text>
+                </Badge>
+            </Stack>
             <ExecuteButton voucher={userVoucher.voucher} />
         </Group>
     );
@@ -127,8 +172,9 @@ const Info: FC<{ userVoucher: UserVoucher }> = ({ userVoucher }) => {
         <Box
             component={Stack}
             bd="0.1px solid rgba(155, 200, 0, 0.3)"
-            p="sm"
+            p="0"
             mt="xs"
+            miw={{ base: "100%", md: "210px" }}
         >
             {userVoucher.type === "MINT" ? (
                 <MintVoucher userVoucher={userVoucher} />
@@ -143,17 +189,63 @@ const Info: FC<{ userVoucher: UserVoucher }> = ({ userVoucher }) => {
 interface VoucherListProps {
     userVouchers: UserVoucher[];
 }
+
+type VoucherGroup = {
+    [k in VoucherType]: UserVoucher[];
+};
+
 const VoucherList: FC<VoucherListProps> = ({ userVouchers }) => {
+    const voucherGroup = useMemo(() => {
+        return userVouchers.reduce((prev, curr): VoucherGroup => {
+            const list = prev[curr.type] ?? [];
+            list.push(curr);
+
+            return {
+                ...prev,
+                [curr.type]: list,
+            };
+        }, {} as VoucherGroup);
+    }, userVouchers);
+
     return (
         <SimpleGrid cols={{ base: 1, md: 2 }}>
-            <Card withBorder>
-                <Center>
-                    <Text size="xl">Your vouchers</Text>
-                </Center>
-                {userVouchers.map((userVoucher, idx) => (
-                    <Info key={idx} userVoucher={userVoucher} />
-                ))}
-            </Card>
+            {voucherGroup.WITHDRAW && (
+                <Card withBorder>
+                    <Center>
+                        <Text size="xl">Your withdrawables</Text>
+                    </Center>
+
+                    {voucherGroup.WITHDRAW && (
+                        <SimpleGrid cols={{ base: 1 }}>
+                            {voucherGroup.WITHDRAW.map((withdrawable, idx) => (
+                                <Info
+                                    key={`withdrawable-${idx}`}
+                                    userVoucher={withdrawable}
+                                />
+                            ))}
+                        </SimpleGrid>
+                    )}
+                </Card>
+            )}
+
+            {voucherGroup.MINT && (
+                <Card withBorder>
+                    <Center>
+                        <Text size="xl">Your Mintables</Text>
+                    </Center>
+
+                    {voucherGroup.MINT && (
+                        <SimpleGrid cols={{ base: 1 }}>
+                            {voucherGroup.MINT.map((mintable, idx) => (
+                                <Info
+                                    key={`mintable-${idx}`}
+                                    userVoucher={mintable}
+                                />
+                            ))}
+                        </SimpleGrid>
+                    )}
+                </Card>
+            )}
         </SimpleGrid>
     );
 };
