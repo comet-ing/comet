@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "description": "JS DApp",
   "dependencies": {
-    "@deroll/app": "^0.6.1",
-    "@deroll/wallet": "^0.7.0",
+    "@cartesi/cli": "^2.0.0-alpha.2",
+    "@deroll/app": "2.0.0-alpha.0",
+    "@deroll/wallet": "2.0.0-alpha.0",
     "viem": "^2.13.7"
   },
   "devDependencies": {
