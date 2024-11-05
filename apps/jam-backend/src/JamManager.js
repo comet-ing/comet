@@ -179,7 +179,12 @@ export default class Jam {
 
     static getAllJamsStats() {
         return Array.from(Jam.jamStats.entries()).map(([jamID, info]) => {
-            return { jamID, ...info };
+            const jam = Jam.getJamByID(jamID);
+            return { 
+                jamID, 
+                ...info,
+                totalContributors: jam ? jam.submittedAddresses.size : 0 
+            };
         });
     }
 
