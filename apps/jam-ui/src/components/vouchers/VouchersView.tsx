@@ -18,6 +18,7 @@ import { FC, useEffect, useMemo } from "react";
 import { formatEther } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
+    useReadCartesiDAppWasOutputExecuted,
     useSimulateCartesiDAppExecuteOutput,
     useWriteCartesiDAppExecuteOutput,
 } from "../../generated/wagmi-rollups";
@@ -35,8 +36,20 @@ const refetchUserVouchers = (queryClient: QueryClient) =>
 
 const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
     const appAddress = useApplicationAddress();
-    const wasExecuted = voucher.executed;
     const queryClient = useQueryClient();
+
+    const {
+        data: wasOutputExecuted,
+        isFetching: checkingOutputExecution,
+        error,
+        refetch,
+    } = useReadCartesiDAppWasOutputExecuted({
+        args: [BigInt(voucher.index)],
+        address: appAddress,
+        query: {
+            enabled: isNotNullOrUndefined(voucher?.index),
+        },
+    });
 
     const prepare = useSimulateCartesiDAppExecuteOutput({
         args: [
@@ -49,6 +62,8 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
         address: appAddress,
         query: {
             enabled:
+                !checkingOutputExecution &&
+                wasOutputExecuted === false &&
                 isNotNullOrUndefined(voucher.proof) &&
                 isNotNullOrUndefined(voucher.proof.outputHashesSiblings) &&
                 isNotNullOrUndefined(voucher.proof.outputIndex),
@@ -67,15 +82,49 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
                 message: "The voucher was executed.",
                 autoClose: 3000,
             });
-
+            refetch();
             refetchUserVouchers(queryClient);
         }
-    }, [wait.isSuccess, queryClient]);
+    }, [wait.isSuccess, queryClient, refetch]);
+
+    useEffect(() => {
+        if (error) {
+            notifications.show({
+                color: "orange",
+                title: "Problem when checking the voucher",
+                message: error.shortMessage ?? error.message,
+                autoClose: false,
+            });
+        }
+    }, [error]);
+
+    if (prepare.error) {
+        console.log(`prepare-error`);
+        console.log(prepare.error);
+    }
+
+    if (execute.error) {
+        console.log(`execute-error`);
+        console.log(execute.error);
+    }
+
+    if (wait.error) {
+        console.log("wait errors");
+        console.log(wait.error);
+    }
+
+    if (wasOutputExecuted) {
+        return (
+            <Badge color="green" radius={0}>
+                Executed!
+            </Badge>
+        );
+    }
 
     if (prepare.error) {
         return (
             <Badge color="red" radius={0}>
-                {prepare.error.message}
+                <Text>Preparing problems</Text>
             </Badge>
         );
     }
@@ -83,15 +132,7 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
     if (execute.error) {
         return (
             <Badge color="red" radius={0}>
-                {execute.error.message}
-            </Badge>
-        );
-    }
-
-    if (wasExecuted) {
-        return (
-            <Badge color="green" radius={0}>
-                Executed!
+                <Text>Executing problems</Text>
             </Badge>
         );
     }
@@ -104,18 +145,10 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
         );
     }
 
-    if (execute === undefined) {
-        return (
-            <Badge color="orange" radius={0}>
-                Preparing transaction...
-            </Badge>
-        );
-    }
-
     return (
         <Button
             h="100%"
-            loading={execute.isPending || wait.isLoading}
+            loading={execute.isPending || wait.isFetching}
             onClick={() => execute.writeContract(prepare.data!.request)}
             radius={0}
         >
