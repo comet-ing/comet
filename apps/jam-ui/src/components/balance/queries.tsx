@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { Address, hexToString, zeroAddress } from "viem";
-import { parseReportPayload } from "../../utils/rollups.inspect";
+import { inspectUrl, parseReportPayload } from "../../utils/rollups.inspect";
 import { InspectResponseBody } from "../../utils/rollups.types";
 
 const rollupHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
@@ -18,7 +18,7 @@ const createError = (message: string) => Promise.reject(new Error(message));
 const fetchBalance = async (account?: Address) => {
     if (account === undefined || account === null) return 0n;
 
-    const url = `${rollupHost}/inspect/${dappAddress}/balance/${account}`;
+    const url = `${inspectUrl}/${encodeURIComponent(`balance/${account}`)}`;
 
     const response = await fetch(url);
 
