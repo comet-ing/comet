@@ -8,6 +8,7 @@ export interface JamStats {
     numTotalMints: number;
     totalMintAmount: string;
     score: string;
+    totalContributors: number;
 }
 export interface JamEntry {
     address: Hex;
