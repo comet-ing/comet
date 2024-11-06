@@ -1,9 +1,7 @@
 import { hexToString } from "viem";
+import { inspectUrl } from "../../utils/rollups.inspect";
 import { InspectResponseBody, Report } from "../../utils/rollups.types";
 import { Jam, JamListFilter, JamLite, JamStats } from "./types";
-
-const rollupHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
-const dappAddress = process.env.NEXT_PUBLIC_APP_ADDRESS;
 
 const parseReport = <T>(report: Report, defaultValue: any): T => {
     if (report) {
@@ -27,7 +25,7 @@ const action = {
 } as const;
 
 export const fetchJams = async (filter: JamListFilter = "all") => {
-    const url = `${rollupHost}/inspect/${dappAddress}/${action[filter]}`;
+    const url = `${inspectUrl}/${action[filter]}`;
 
     const response = await fetch(url);
 
@@ -49,7 +47,7 @@ export const fetchJamById = async (id: number) => {
     if (id === undefined || id === null)
         return createError("Can't get information without an id");
 
-    const url = `${rollupHost}/inspect/${dappAddress}/jams/${id}`;
+    const url = `${inspectUrl}/${encodeURIComponent(`jams/${id}`)}`;
 
     const response = await fetch(url);
 
@@ -67,7 +65,7 @@ export const fetchJamById = async (id: number) => {
 };
 
 export const fetchJamsStats = async () => {
-    const url = `${rollupHost}/inspect/${dappAddress}/jamstats`;
+    const url = `${inspectUrl}/jamstats`;
 
     const response = await fetch(url);
 

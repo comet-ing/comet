@@ -26,3 +26,7 @@ export const parseReportPayload = <T>(
 
     return defaultValue;
 };
+
+const rollupHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
+const dappAddress = process.env.NEXT_PUBLIC_APP_ADDRESS;
+export const inspectUrl = `${rollupHost}/inspect/${dappAddress}`;
