@@ -1,23 +1,24 @@
 {
-  "name": "my-dapp",
-  "version": "0.1.0",
-  "description": "JS DApp",
-  "dependencies": {
-    "@cartesi/cli": "^2.0.0-alpha.2",
-    "@deroll/app": "2.0.0-alpha.0",
-    "@deroll/wallet": "2.0.0-alpha.0",
-    "viem": "^2.13.7"
-  },
-  "devDependencies": {
-    "esbuild": "^0.19.2"
-  },
-  "scripts": {
-    "build": "esbuild ./src/index.js --bundle --outfile=dist/index.js --platform=node --target=node20",
-    "start": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:5004\" node src/index.js"
-  },
-  "keywords": [
-    "cartesi"
-  ],
-  "license": "MIT",
-  "type": "module"
+    "name": "my-dapp",
+    "version": "0.1.0",
+    "description": "JS DApp",
+    "dependencies": {
+        "@cartesi/cli": "^2.0.0-alpha.2",
+        "@deroll/app": "2.0.0-alpha.0",
+        "@deroll/wallet": "2.0.0-alpha.0",
+        "viem": "^2.13.7"
+    },
+    "devDependencies": {
+        "esbuild": "^0.19.2"
+    },
+    "scripts": {
+        "build": "esbuild ./src/index.js --bundle --outfile=dist/index.js --platform=node --target=node20",
+        "start": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:5004\" node src/index.js",
+        "cartesi": "cartesi"
+    },
+    "keywords": [
+        "cartesi"
+    ],
+    "license": "MIT",
+    "type": "module"
 }
