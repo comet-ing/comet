@@ -21,7 +21,7 @@ export default function HomePage() {
             <Group mb="sm" align="center">
                 <FaChartSimple size={40} />
                 <Title order={2} style={{ alignSelf: "end" }}>
-                    Comet Stats
+                    Comet Leaderboard
                 </Title>
             </Group>
             <JamsStatsView />
