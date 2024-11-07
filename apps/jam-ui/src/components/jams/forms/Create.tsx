@@ -17,7 +17,9 @@ import { useAccount } from "wagmi";
 import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
 import { useChainId } from "../../../hooks/useChainId";
 import useEspressoSequencer from "../../../hooks/useEspressoSequencer";
+import { charactersLeft } from "../../../utils/functions";
 import { CenteredErrorMessage } from "../../CenteredErrorMessage";
+import { JAM_DESCRIPTION_CHAR_LIMIT, JAM_ENTRY_CHAR_LIMIT } from "./constants";
 
 export interface Props {
     onSuccess?: () => void;
@@ -40,6 +42,8 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                 value === ""
                     ? "Entry is a required since it is the genesis of the collaboration"
                     : null,
+            description: (value) =>
+                value === "" ? "A description is a required field" : null,
         },
         transformValues: (values) => ({
             genesisEntry: values.genesisEntry,
@@ -70,6 +74,15 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
         }
     }, [status, onSuccess, form, reset]);
 
+    const genesisEntryCharactersLeft = charactersLeft(
+        form.getValues().genesisEntry,
+        JAM_ENTRY_CHAR_LIMIT,
+    ).left;
+    const descriptionCharactersLeft = charactersLeft(
+        form.getValues().description,
+        JAM_DESCRIPTION_CHAR_LIMIT,
+    ).left;
+
     return (
         <form id="create-jam-form">
             <Stack>
@@ -96,7 +109,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                 <NumberInput
                     hideControls
                     allowNegative={false}
-                    min={1}
+                    min={2}
                     max={20}
                     label="Entries"
                     description="The number of entries for this work. That also means the number of creators since it is one contribution per address."
@@ -108,9 +121,15 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                     autosize
                     minRows={2}
                     maxRows={5}
+                    maxLength={JAM_DESCRIPTION_CHAR_LIMIT}
                     resize="vertical"
                     label="Description"
                     description="The theme behind this work of art. That helps coming collaborators to get the essence"
+                    rightSection={
+                        descriptionCharactersLeft === 0
+                            ? ""
+                            : descriptionCharactersLeft
+                    }
                     withAsterisk
                     {...form.getInputProps("description")}
                 />
@@ -120,8 +139,14 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                     minRows={2}
                     maxRows={5}
                     resize="vertical"
+                    maxLength={JAM_ENTRY_CHAR_LIMIT}
                     label="Genesis entry"
                     description="The first content of the collaboration."
+                    rightSection={
+                        genesisEntryCharactersLeft === 0
+                            ? ""
+                            : genesisEntryCharactersLeft
+                    }
                     withAsterisk
                     {...form.getInputProps("genesisEntry")}
                 />
@@ -145,7 +170,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
                             })
                         }
                     >
-                        Create (L2)
+                        Create
                     </Button>
                 </Group>
             </Stack>
