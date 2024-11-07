@@ -2,6 +2,7 @@
 import {
     Alert,
     Anchor,
+    Box,
     Button,
     Card,
     Center,
@@ -11,6 +12,7 @@ import {
     Stack,
     Text,
     Title,
+    Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -25,6 +27,8 @@ import {
     useWriteEtherPortalDepositEther,
 } from "../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../hooks/useApplicationAddress";
+import { getRelativeTime, localizedDate } from "../../utils/functions";
+import AddressOrENSName from "../Address";
 import { CometAlert } from "../CometAlert";
 import { CustomAvatar } from "./CustomAvatar";
 import { ContributeJamForm } from "./forms/Contribute";
@@ -37,7 +41,6 @@ type MintButtonProp = {
 
 const MintButton: FC<MintButtonProp> = ({ jamId, price }) => {
     const { chain, isConnected } = useAccount();
-
     const address = useApplicationAddress();
     const execLayerData = stringToHex(
         JSON.stringify({
@@ -70,9 +73,9 @@ const MintButton: FC<MintButtonProp> = ({ jamId, price }) => {
                 title: <Title order={4}>Nice!</Title>,
                 message: (
                     <Group>
-                        <Text>Request for mint confirmed</Text>
+                        <Text>Minting in Progress, sit back and relax!</Text>{" "}
                         <Anchor component={Link} href="/collections">
-                            Check your collections
+                            Check collections in a few minutes.
                         </Anchor>
                     </Group>
                 ),
@@ -106,10 +109,10 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
     const onSuccess = useCallback(() => {
         notifications.show({
             withCloseButton: true,
-            autoClose: false,
+            autoClose: 3000,
             color: "green",
             title: "Success",
-            message: "Content added!",
+            message: "Contribution submitted!",
         });
         closeModal();
 
@@ -192,7 +195,7 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
                     onClick={openModal}
                     disabled={!canContribute}
                 >
-                    COMETING
+                    CONTRIBUTE
                 </Button>
                 {isClosed && (
                     <MintButton price={data.mintPrice} jamId={data.id} />
@@ -200,18 +203,44 @@ export const JamDetails: FC<JamDetailsProps> = ({ jamId }) => {
             </Group>
 
             {data.entries.map((entry, idx) => (
-                <Card key={idx}>
-                    <Text py="lg">{entry.text}</Text>
-                    <Card.Section inheritPadding withBorder>
-                        <Group gap={0}>
-                            <Text c="dimmed" size="sm">
-                                By:{" "}
-                            </Text>
-                            <CustomAvatar address={entry.address} size={28} />
-                            {address?.toLowerCase() ===
-                            entry.address.toLowerCase()
-                                ? "(You)"
-                                : ""}
+                <Card key={idx} py="xl">
+                    {/* <Text py="lg">{entry.text}</Text> */}
+                    <Card.Section inheritPadding>
+                        <Group gap={2} wrap="nowrap">
+                            <Box style={{ alignSelf: "baseline" }}>
+                                <CustomAvatar
+                                    address={entry.address}
+                                    size={28}
+                                />
+                            </Box>
+                            <Stack px="sm" py="2" gap="xs">
+                                <Group gap={0}>
+                                    <AddressOrENSName
+                                        address={entry.address}
+                                        shorten
+                                        fw="bold"
+                                        size="sm"
+                                    />
+                                    {address?.toLowerCase() ===
+                                    entry.address.toLowerCase()
+                                        ? "(You)"
+                                        : ""}
+
+                                    <Tooltip
+                                        label={localizedDate(entry.timestamp)}
+                                    >
+                                        <Text
+                                            fw="normal"
+                                            c="dimmed"
+                                            px={3}
+                                            size="sm"
+                                        >
+                                            {getRelativeTime(entry.timestamp)}
+                                        </Text>
+                                    </Tooltip>
+                                </Group>
+                                <Text>{entry.text}</Text>
+                            </Stack>
                         </Group>
                     </Card.Section>
                 </Card>
