@@ -31,6 +31,7 @@ import { Voucher, VoucherType } from "./types";
 
 const isNotNullOrUndefined = (value: any) =>
     value !== null && value !== undefined;
+
 const refetchUserVouchers = (queryClient: QueryClient) =>
     queryClient.invalidateQueries({ queryKey: voucherKeys.lists() });
 
@@ -98,6 +99,30 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
         }
     }, [error]);
 
+    useEffect(() => {
+        if (prepare.error) {
+            notifications.show({
+                color: "orange",
+                title: "Problem preparing voucher execution",
+                // @ts-ignore
+                message: prepare.error.shortMessage ?? prepare.error.message,
+                autoClose: false,
+            });
+        }
+    }, [prepare.error]);
+
+    useEffect(() => {
+        if (execute.error) {
+            notifications.show({
+                color: "orange",
+                title: "Problem executing the voucher",
+                // @ts-ignore
+                message: execute.error.shortMessage ?? execute.error.message,
+                autoClose: false,
+            });
+        }
+    }, [execute.error]);
+
     if (prepare.error) {
         console.log(`prepare-error`);
         console.log(prepare.error);
@@ -109,8 +134,16 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
     }
 
     if (wait.error) {
-        console.log("wait errors");
+        console.log("wait error");
         console.log(wait.error);
+    }
+
+    if (checkingOutputExecution || prepare.isFetching) {
+        return (
+            <Badge color="haiti" radius={0}>
+                Checking...
+            </Badge>
+        );
     }
 
     if (wasOutputExecuted) {
@@ -121,18 +154,10 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
         );
     }
 
-    if (prepare.error) {
+    if (prepare.error || execute.error || error) {
         return (
-            <Badge color="red" radius={0}>
-                <Text>Preparing problems</Text>
-            </Badge>
-        );
-    }
-
-    if (execute.error) {
-        return (
-            <Badge color="red" radius={0}>
-                <Text>Executing problems</Text>
+            <Badge color="orange" radius={0}>
+                <Text size="xs">A problem happen</Text>
             </Badge>
         );
     }
@@ -148,7 +173,12 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
     return (
         <Button
             h="100%"
-            loading={execute.isPending || wait.isFetching}
+            loading={
+                prepare.isFetching ||
+                execute.isPending ||
+                wait.isFetching ||
+                checkingOutputExecution
+            }
             onClick={() => execute.writeContract(prepare.data!.request)}
             radius={0}
         >
