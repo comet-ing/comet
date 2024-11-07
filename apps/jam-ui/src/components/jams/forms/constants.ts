@@ -1,0 +1,2 @@
+export const JAM_ENTRY_CHAR_LIMIT = 500;
+export const JAM_DESCRIPTION_CHAR_LIMIT = 300;

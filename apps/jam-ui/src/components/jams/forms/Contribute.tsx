@@ -8,7 +8,9 @@ import { useAccount } from "wagmi";
 import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
 import { useChainId } from "../../../hooks/useChainId";
 import useEspressoSequencer from "../../../hooks/useEspressoSequencer";
+import { charactersLeft } from "../../../utils/functions";
 import { CenteredErrorMessage } from "../../CenteredErrorMessage";
+import { JAM_ENTRY_CHAR_LIMIT } from "./constants";
 
 export interface Props {
     onSuccess?: () => void;
@@ -62,6 +64,11 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
         }
     }, [status, onSuccess, form, reset]);
 
+    const entryCharactersLeft = charactersLeft(
+        form.getValues().entry,
+        JAM_ENTRY_CHAR_LIMIT,
+    ).left;
+
     return (
         <form id="contribute-form">
             <Stack>
@@ -69,9 +76,13 @@ export const ContributeJamForm: FC<Props> = ({ onSuccess, jamId }) => {
                     autosize
                     minRows={2}
                     maxRows={5}
+                    maxLength={JAM_ENTRY_CHAR_LIMIT}
                     resize="vertical"
                     label="Entry"
                     description="Contribute to the Comet content."
+                    rightSection={
+                        entryCharactersLeft === 0 ? "" : entryCharactersLeft
+                    }
                     withAsterisk
                     {...form.getInputProps("entry")}
                 />
