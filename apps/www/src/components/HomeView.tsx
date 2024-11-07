@@ -2,22 +2,28 @@
 import {
     Anchor,
     Box,
+    Button,
     Container,
     Group,
     Stack,
     Text,
     Title,
+    Tooltip,
     getThemeColor,
     useMantineTheme,
 } from "@mantine/core";
+import Link from "next/link";
 import { FaGithub, FaXTwitter } from "react-icons/fa6";
+import useCometAppUrl from "../hooks/useCometAppUrl";
 import { horizonOutline2 } from "../styles/fonts";
-import { BaseLogoWhite } from "./BaseLogo";
+import styles from "../styles/modules/app.module.css";
 import { CartesiLogo } from "./CartesiLogo";
 import CometLogo from "./CometLogo";
+import { EspressoLogo } from "./ExpressoLogo";
 
 const HomeView = () => {
     const theme = useMantineTheme();
+    const cometAppUrl = useCometAppUrl();
     const cyan = getThemeColor("cyan", theme);
     const color = "#161038";
     const textColor = "#DCEAD3";
@@ -42,30 +48,45 @@ const HomeView = () => {
                 </Text>
 
                 <Stack mt="5rem" gap="xs">
-                    <Group gap={8} justify="center">
-                        <Text size="sm" c={textColor}>
-                            Coming on
-                        </Text>
-                        <Anchor
-                            href="https://www.base.org/"
-                            target="_blank"
-                            h={35}
-                        >
-                            <BaseLogoWhite width={64} height={34} />
-                        </Anchor>
-                    </Group>
                     <Group gap="8" justify="center">
                         <Text size="sm" c={textColor}>
                             powered by
                         </Text>
-                        <Anchor
-                            href="https://cartesi.io/"
-                            target="_blank"
-                            h={35}
-                        >
-                            <CartesiLogo width={34} height={34} color={cyan} />
-                        </Anchor>
+                        <Tooltip label="Cartesi Rollups">
+                            <Anchor
+                                href="https://cartesi.io/"
+                                target="_blank"
+                                h={35}
+                            >
+                                <CartesiLogo
+                                    width={34}
+                                    height={34}
+                                    color={cyan}
+                                />
+                            </Anchor>
+                        </Tooltip>
+
+                        <Tooltip label="Espresso Sequencer">
+                            <Anchor
+                                href="https://www.espressosys.com/"
+                                target="_blank"
+                                h={35}
+                            >
+                                <EspressoLogo width={33} height={34} />
+                            </Anchor>
+                        </Tooltip>
                     </Group>
+
+                    <Button
+                        variant="outline"
+                        component={Link}
+                        href={cometAppUrl}
+                        my="md"
+                        className={styles.enter_app_btn}
+                        c="#b77237"
+                    >
+                        <Text>Enter the App</Text>
+                    </Button>
                 </Stack>
                 <Group py="lg">
                     <Anchor

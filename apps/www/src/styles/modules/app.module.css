@@ -1,0 +1,6 @@
+.enter_app_btn {
+    transition: all 0.5s ease-in-out;
+    &:hover {
+        color: var(--mantine-color-cyan-5) !important;
+    }
+}
