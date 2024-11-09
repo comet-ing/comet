@@ -33,7 +33,7 @@ export async function generateMetadata({
     return metadata;
 }
 
-export async function getJam(appId: string) {
+async function getJam(appId: string) {
     try {
         const id = parseInt(appId);
         const jam = await fetchJamById(id);
