@@ -345,7 +345,7 @@ export const VouchersView: FC = () => {
     if (!data) {
         return (
             <Center>
-                <CometAlert message="There are no vouchers to be presented" />
+                <CometAlert message="There are no collectables to be presented yet." />
             </Center>
         );
     }
@@ -354,8 +354,8 @@ export const VouchersView: FC = () => {
         return (
             <Center>
                 <CometAlert
-                    title="No Vouchers!"
-                    message={`We could not find vouchers for account ${address}`}
+                    title="No Collectables!"
+                    message={`We could not find collection items for account ${address}`}
                 />
             </Center>
         );
