@@ -56,12 +56,17 @@ export const ListJams: FC<ListProps> = ({ jams }) => {
                         </Group>
                     </Card.Section>
 
-                    <Card.Section inheritPadding mih="5rem" py="md">
+                    <Card.Section inheritPadding mih="5rem" py="md" mb="1.3rem">
                         <Text size="lg" lineClamp={3}>
                             {jam.description}
                         </Text>
                     </Card.Section>
-                    <Card.Section mt="lg" inheritPadding>
+                    <Card.Section
+                        inheritPadding
+                        pos="absolute"
+                        bottom="1.3rem"
+                        w="100%"
+                    >
                         <Group justify="space-between">
                             <CollabGroup jam={jam} />
                             <Group>
