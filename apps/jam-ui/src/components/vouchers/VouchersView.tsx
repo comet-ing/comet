@@ -99,6 +99,7 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
         }
     }, [error]);
 
+    /*
     useEffect(() => {
         if (prepare.error) {
             notifications.show({
@@ -110,6 +111,7 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
             });
         }
     }, [prepare.error]);
+    */
 
     useEffect(() => {
         if (execute.error) {
@@ -157,7 +159,7 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
     if (prepare.error || execute.error || error) {
         return (
             <Badge color="orange" radius={0}>
-                <Text size="xs">A problem happen</Text>
+                <Text size="xs">A Problem Occurred</Text>
             </Badge>
         );
     }
