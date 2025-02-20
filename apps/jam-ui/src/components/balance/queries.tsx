@@ -18,9 +18,12 @@ const createError = (message: string) => Promise.reject(new Error(message));
 const fetchBalance = async (account?: Address) => {
     if (account === undefined || account === null) return 0n;
 
-    const url = `${inspectUrl}/${encodeURIComponent(`balance/${account}`)}`;
-
-    const response = await fetch(url);
+    const payload = `balance/${account}`;
+    const payloadBlob = new TextEncoder().encode(payload);
+    const response = await fetch(inspectUrl, {
+        method: 'POST',
+        body: payloadBlob,
+    });
 
     if (!response.ok) {
         return createError(`Network response error - ${response.status}`);

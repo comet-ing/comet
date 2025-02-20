@@ -25,9 +25,13 @@ const action = {
 } as const;
 
 export const fetchJams = async (filter: JamListFilter = "all") => {
-    const url = `${inspectUrl}/${action[filter]}`;
+    const payload = action[filter];
+    const payloadBlob = new TextEncoder().encode(payload);
 
-    const response = await fetch(url);
+    const response = await fetch(inspectUrl, {
+        method: 'POST',
+        body: payloadBlob, 
+    });
 
     if (!response.ok) {
         return createError(`Network response error - ${response.status}`);
@@ -47,9 +51,13 @@ export const fetchJamById = async (id: number) => {
     if (id === undefined || id === null)
         return createError("Can't get information without an id");
 
-    const url = `${inspectUrl}/${encodeURIComponent(`jams/${id}`)}`;
-
-    const response = await fetch(url);
+    const payload = `jams/${id}`;
+    const payloadBlob = new TextEncoder().encode(payload);
+    
+    const response = await fetch(inspectUrl, {
+        method: 'POST',
+        body: payloadBlob,
+    });
 
     if (!response.ok) {
         return createError(`Network response error - ${response.status}`);
@@ -65,9 +73,12 @@ export const fetchJamById = async (id: number) => {
 };
 
 export const fetchJamsStats = async () => {
-    const url = `${inspectUrl}/jamstats`;
-
-    const response = await fetch(url);
+    const payload = 'jamstats';
+    const payloadBlob = new TextEncoder().encode(payload);
+    const response = await fetch(inspectUrl, {
+        method: 'POST',
+        body: payloadBlob,
+    });
 
     if (!response.ok) {
         return createError(`Network response error - ${response.status}`);
