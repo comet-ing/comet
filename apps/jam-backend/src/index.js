@@ -170,7 +170,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
         var input = hexToString(payload);
         console.log("Payload : ", input);
         input = JSON.parse(input);
-        const timestamp = metadata.timestamp ?? Date.now();
+        const timestamp = metadata.block_timestamp ?? Date.now();
 
         console.log(`####TIMESTAMP: ${timestamp}`);
         try {

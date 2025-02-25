@@ -32,11 +32,11 @@ const getLocale = () => {
 };
 
 export const getRelativeTime = (timestamp: number) => {
-    return dayjs().locale(getLocale()).to(dayjs(timestamp));
+    return dayjs().locale(getLocale()).to(dayjs(timestamp * 1000));
 };
 
 console.log();
 
 export const localizedDate = (timestamp: number) => {
-    return dayjs(timestamp).locale(getLocale()).format("L LT");
+    return dayjs(timestamp * 1000).locale(getLocale()).format("L LT");
 };
