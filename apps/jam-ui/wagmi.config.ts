@@ -1,9 +1,9 @@
-import hardhatDeploy from "@sunodo/wagmi-plugin-hardhat-deploy";
+import CartesiAppContract from "@cartesi/rollups/out/Application.sol/Application.json" with { type: "json" };
+import OutputsContract from '@cartesi/rollups/out/Outputs.sol/Outputs.json' with { type: "json" };
 import { defineConfig } from "@wagmi/cli";
 import { react } from "@wagmi/cli/plugins";
-import { Abi } from "viem";
-import OutputsContract from '../../node_modules/@cartesi/rollups/export/artifacts/contracts/common/Outputs.sol/Outputs.json' with { type: "json" };
-import CartesiAppContract from "../../node_modules/@cartesi/rollups/export/artifacts/contracts/dapp/Application.sol/Application.json" with { type: "json" };
+import { Abi, Address } from "viem";
+import EtherPortalDeployment from './deployments/EtherPortal.json' with { type: "json" };
 
 export default defineConfig({
     out: "src/generated/wagmi-rollups/index.ts",
@@ -15,12 +15,14 @@ export default defineConfig({
         {
             name: "OutputsFactory",
             abi: OutputsContract.abi as Abi
-        }
+        }, 
+        {
+            name: EtherPortalDeployment.contractName,
+            abi: EtherPortalDeployment.abi as Abi,
+            address: EtherPortalDeployment.address as Address
+        }        
     ],
-    plugins: [
-        hardhatDeploy({
-            directory: "../../node_modules/@cartesi/rollups/export/abi",
-        }),
+    plugins: [        
         react(),
     ],
 });
