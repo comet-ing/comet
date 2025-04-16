@@ -20,13 +20,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Image from "next/image";
 import { ReactNode } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
-import { createConfig, fallback, http, WagmiProvider } from "wagmi";
-import { foundry, sepolia } from "wagmi/chains";
+import { createConfig, http, WagmiProvider } from "wagmi";
+import { cannon, foundry, sepolia } from "wagmi/chains";
 
 // select chain based on env var
-const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "31337");
-const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
-const chain = [foundry, sepolia].find((c) => c.id == chainId) || foundry;
+const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "13370");
+const nodeRpcUrl = process.env.NEXT_PUBLIC_NODE_RPC_URL;
+const chain =
+    [foundry, sepolia, cannon].find((c) => c.id == chainId) || foundry;
 
 const projectId = "37a6d6f11d78a12ca814a377a53b5b55";
 
@@ -78,6 +79,10 @@ const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
 
 const [defaultFoundryRpcUrl] = foundry.rpcUrls.default.http;
 const [defaultSepoliaRpcUrl] = sepolia.rpcUrls.default.http;
+const [defaultCannonRpcUrl] = cannon.rpcUrls.default.http;
+
+const buildTransport = (defaultRpcUrl: string, nodeRpcUrl?: string) =>
+    nodeRpcUrl ? http(nodeRpcUrl) : http(defaultRpcUrl);
 
 const wagmiConfig = createConfig({
     ssr: true,
@@ -85,13 +90,9 @@ const wagmiConfig = createConfig({
     chains: [chain],
     multiInjectedProviderDiscovery: false,
     transports: {
-        [foundry.id]: http(defaultFoundryRpcUrl),
-        [sepolia.id]: alchemyApiKey
-            ? fallback([
-                  http(`https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`),
-                  http(defaultSepoliaRpcUrl),
-              ])
-            : http(defaultSepoliaRpcUrl),
+        [foundry.id]: buildTransport(defaultFoundryRpcUrl, nodeRpcUrl),
+        [sepolia.id]: buildTransport(defaultSepoliaRpcUrl, nodeRpcUrl),
+        [cannon.id]: buildTransport(defaultCannonRpcUrl, nodeRpcUrl),
     },
 });
 
