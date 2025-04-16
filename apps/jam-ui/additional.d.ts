@@ -5,9 +5,9 @@ declare namespace NodeJS {
          */
         NEXT_PUBLIC_CHAIN_ID: string;
         /**
-         * Alchemy API key to have an extra rpc-node to work in conjunction with public nodes.
+         * A full node RPC URL e.g. http://localhost:8080/anvil or https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}
          */
-        NEXT_PUBLIC_ALCHEMY_API_KEY: string;
+        NEXT_PUBLIC_NODE_RPC_URL: string;
         /**
          * Rollups backend endpoint
          */
