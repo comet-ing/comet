@@ -2,7 +2,7 @@
 
 # Configuration
 ROLLUP_HOST="http://localhost:8080"
-DAPP_ADDRESS="0xab7528bb862fB57E8A2BCd567a2e929a0Be56a5e"
+DAPP_ADDRESS="0xd0d2e96abecd5f4e540f566c7b6a9cec08246591"
 ITERATIONS=5  # Number of times each browser will run through all endpoints
 NUM_BROWSERS=4  # Number of simulated browsers
 

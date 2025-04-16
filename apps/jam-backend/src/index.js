@@ -1,5 +1,6 @@
 // XXX even though ethers is not used in the code below, it's very likely
 // it will be used by any DApp, so we are already including it here
+import { etherPortalAddress } from "@cartesi/viem/abi";
 import { createApp } from "@deroll/app";
 import { createWallet } from "@deroll/wallet";
 import {
@@ -17,17 +18,23 @@ import nftContractAbi from "./SimpleERC1155ABI.js";
 
 // Create the application
 const app = createApp({
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
     url: process.env.ROLLUP_HTTP_SERVER_URL || "http://127.0.0.1:5004",
 });
 
 // Set smart contract addresses as per network
-var ether_portal_address = getAddress(
-    "0xfa2292f6D85ea4e629B156A4f99219e30D12EE17",
-);
+var ether_portal_address = getAddress(etherPortalAddress);
+
+/**
+ * @deprecated
+ */
 var dapp_address_relay_contract = getAddress(
     "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE",
 );
-var dapp_address = getAddress("0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e");
+
+/**
+ * Set by input-added event. Used globally.
+ */
 var nft_erc1155_address = "";
 
 // Instantiate wallet for the rollup accounts
@@ -36,7 +43,8 @@ const wallet = createWallet();
 // Main advance request handler
 app.addAdvanceHandler(async ({ metadata, payload }) => {
     try {
-        console.log("Advance Request");
+        console.log("Advance Request(2)");
+        console.log(`raw-payload: ${payload}`);
         const sender = getAddress(metadata.msg_sender);
         // TODO: add a mint condition when user already has in-app balance i.e. minting via L2 msg.
         // ether deposit handling
@@ -45,7 +53,6 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
             try {
                 // Use the wallet's handler to process the deposit
                 await wallet.handler({ metadata, payload });
-
                 console.log(
                     "Wallet after deposit: ",
                     wallet.getWallet(getAddress(slice(payload, 0, 20))),
@@ -71,7 +78,9 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
             try {
                 etherDepositExecJSON = JSON.parse(hexToString(input_data[2]));
             } catch (error) {
-                console.warn("Invalid JSON in deposit payload. Treating as simple deposit.");
+                console.warn(
+                    "Invalid JSON in deposit payload. Treating as simple deposit.",
+                );
                 return "accept";
             }
 
@@ -149,12 +158,15 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 
                 return "accept";
             } else {
-                console.warn("Either action for mint or NFT address not set. Treating as simple deposit.");
+                console.warn(
+                    "Either action for mint or NFT address not set. Treating as simple deposit.",
+                );
                 return "accept";
             }
         }
 
         // Relay dApp address
+        // TODO: Check the removal of this logic. There is no address_relay_contract anymore
         if (sender === dapp_address_relay_contract) {
             console.log("Dapp Address relay request");
             try {
@@ -168,7 +180,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 
         // Jam Action handling
         var input = hexToString(payload);
-        console.log("Payload : ", input);
+        console.log("Payload(hex-to-string) : ", input);
         input = JSON.parse(input);
         const timestamp = metadata.block_timestamp ?? Date.now();
 
@@ -270,9 +282,8 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 app.addInspectHandler(async ({ payload }) => {
     try {
         console.log("Inspect Request");
-        payload = hexToString(payload);
-        console.log("Payload : ", payload);
-        const payloadArr = payload.split("/");
+        const decodedPayload = hexToString(payload);
+        const payloadArr = decodedPayload.split("/");
 
         switch (payloadArr[0]) {
             case "alljams":

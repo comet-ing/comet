@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # Set common variables
-INPUT_BOX_ADDRESS="0x593E5BCf894D6829Dd26D0810DA7F064406aebB6"
-APPLICATION_ADDRESS="0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e"
+INPUT_BOX_ADDRESS="0xB6b39Fb3dD926A9e3FBc7A129540eEbeA3016a6c"
+APPLICATION_ADDRESS="0xd0d2e96abecd5f4e540f566c7b6a9cec08246591"
+ETHER_PORTAL_ADDRESS="0xd31aD6613bDaA139E7D12B2428C0Dd00fdBF8aDa"
 MNEMONIC="test test test test test test test test test test test junk"
-RPC_URL="http://localhost:8545/"
+RPC_URL="http://localhost:8080/anvil"
 
 # Function to send input using cast
 send_input() {
@@ -48,7 +49,7 @@ cast send \
     --mnemonic "$MNEMONIC" \
     --mnemonic-index 0 \
     --rpc-url "$RPC_URL" \
-    0xfa2292f6D85ea4e629B156A4f99219e30D12EE17 \
+    $ETHER_PORTAL_ADDRESS \
     "depositEther(address,bytes)" \
     $APPLICATION_ADDRESS \
     0x \
@@ -65,7 +66,7 @@ cast send \
     --mnemonic "$MNEMONIC" \
     --mnemonic-index 5 \
     --rpc-url "$RPC_URL" \
-    0xfa2292f6D85ea4e629B156A4f99219e30D12EE17 \
+    $ETHER_PORTAL_ADDRESS \
     "depositEther(address,bytes)" \
     $APPLICATION_ADDRESS \
     0x7b22616374696f6e223a226a616d2e6d696e74222c20226a616d4944223a307d \
