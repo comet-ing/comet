@@ -1,0 +1,14 @@
+[profile.default]
+src = "contracts/src"
+out = "contracts/out"
+cache_path = 'contracts/cache'
+libs = ["dependencies"]
+via_ir = true
+optimizer = true
+solc-version = "0.8.23"
+
+[dependencies]
+forge-std = "1.9.6"
+"@openzeppelin-contracts" = "5.2.0"
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

@@ -10,12 +10,19 @@
         "viem": "^2"
     },
     "devDependencies": {
-        "esbuild": "^0.19.2"
+        "@dotenvx/dotenvx": "^1.40.0",
+        "chalk": "^5.4.1",
+        "esbuild": "^0.19.2",
+        "shelljs": "^0.9.2"
     },
     "scripts": {
-        "build": "esbuild ./src/index.js --bundle --outfile=dist/index.js --platform=node --target=node20",
+        "clean": "yarn clean:forge",
         "start": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:5004\" node src/index.js",
-        "cartesi": "cartesi"
+        "build": "esbuild ./src/index.js --bundle --outfile=dist/index.js --platform=node --target=node20",
+        "clean:deployments": "rm -rf contracts/deployments",
+        "clean:forge": "forge clean",
+        "build:contracts": "forge soldeer install && forge build contracts/src",
+        "deploy:devnet:contract": "dotenvx run --env-file=.env.devnet -- node scripts/setupERC1155Contract.mjs"
     },
     "keywords": [
         "cartesi"

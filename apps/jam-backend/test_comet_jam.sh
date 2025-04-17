@@ -55,11 +55,6 @@ cast send \
     0x \
     --value 2ether
 
-# Set NFT address
-echo "Setting NFT address..."
-NFT_ADDRESS_INPUT="7b22616374696f6e223a226a616d2e7365744e465441646472657373222c202261646472657373223a22307837313235313665363143384233383364463441363343466538336437373031426365353442303365227d"
-send_input $NFT_ADDRESS_INPUT 0
-
 # 4. Ether Deposit to Mint a Comet
 echo "4. Performing Ether deposit to mint a Comet..."
 cast send \
