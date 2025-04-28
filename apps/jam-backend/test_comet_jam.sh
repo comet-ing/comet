@@ -2,7 +2,7 @@
 
 # Set common variables
 INPUT_BOX_ADDRESS="0xB6b39Fb3dD926A9e3FBc7A129540eEbeA3016a6c"
-APPLICATION_ADDRESS="0xd0d2e96abecd5f4e540f566c7b6a9cec08246591"
+APPLICATION_ADDRESS="0x3b352ef8dbd35fa90c0ef4ff5d7cb41008d49647"
 ETHER_PORTAL_ADDRESS="0xd31aD6613bDaA139E7D12B2428C0Dd00fdBF8aDa"
 MNEMONIC="test test test test test test test test test test test junk"
 RPC_URL="http://localhost:8080/anvil"

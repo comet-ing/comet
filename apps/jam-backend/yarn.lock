@@ -39,13 +39,21 @@
   dependencies:
     viem "^2.21.34"
 
-"@deroll/wallet@https://github.com/brunomenezes/deroll/releases/download/%40deroll%2Fwallet%402.0.0-alpha.1/deroll-wallet-2.0.0-alpha.1.tgz":
+"@deroll/core@2.0.0-alpha.1":
   version "2.0.0-alpha.1"
-  resolved "https://github.com/brunomenezes/deroll/releases/download/%40deroll%2Fwallet%402.0.0-alpha.1/deroll-wallet-2.0.0-alpha.1.tgz#fdd9c22911af310e061833a0ff0d22f0b000c760"
+  resolved "https://registry.yarnpkg.com/@deroll/core/-/core-2.0.0-alpha.1.tgz#98e576aa397f419a71302dbb4e1e6c890a5fc3aa"
+  integrity sha512-lk3h2D0EdoKPGvbwWslFef4x8g8JokFKQQyOemIa8/GVBHwzHE6jaz64VP7pD/kV+1ZY5SI2lgYmKj3CYJL04g==
+  dependencies:
+    viem "^2.27.3"
+
+"@deroll/wallet@2.0.0-alpha.1":
+  version "2.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@deroll/wallet/-/wallet-2.0.0-alpha.1.tgz#fd32e16aef325a715c081039c32a992134afa72f"
+  integrity sha512-KceYRcC1hWIgEvQ7fA0RrUVzOO3AWF3EoS0WAfX8OF6FX2Hq6/6BOkzq9y0DNbjDXhSKnCr+p24M4VmzbQPr0Q==
   dependencies:
     "@cartesi/viem" "2.0.0-alpha.4"
-    "@deroll/core" "2.0.0-alpha.0"
-    viem "^2.21.34"
+    "@deroll/core" "2.0.0-alpha.1"
+    viem "^2.27.3"
 
 "@dotenvx/dotenvx@^1.40.0":
   version "1.40.0"
@@ -194,7 +202,7 @@
   dependencies:
     "@noble/hashes" "1.7.1"
 
-"@noble/curves@^1.6.0", "@noble/curves@~1.8.1":
+"@noble/curves@1.8.2", "@noble/curves@^1.6.0", "@noble/curves@~1.8.1":
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.8.2.tgz#8f24c037795e22b90ae29e222a856294c1d9ffc7"
   integrity sha512-vnI7V6lFNe0tLAuJMu+2sX+FcL14TaCWy1qiczg1VwRmPrpQCdq5ESXQMqUc2tluRNf6irBXrWbl1mGN8uaU/g==
@@ -764,6 +772,20 @@ viem@^2, viem@^2.21.34, viem@^2.26.0:
   dependencies:
     "@noble/curves" "1.8.1"
     "@noble/hashes" "1.7.1"
+    "@scure/bip32" "1.6.2"
+    "@scure/bip39" "1.5.4"
+    abitype "1.0.8"
+    isows "1.0.6"
+    ox "0.6.9"
+    ws "8.18.1"
+
+viem@^2.27.3:
+  version "2.28.0"
+  resolved "https://registry.yarnpkg.com/viem/-/viem-2.28.0.tgz#b04bea64f067d6bfdb8603b39561b732a1e64066"
+  integrity sha512-Z4W5O1pe+6pirYTFm451FcZmfGAUxUWt2L/eWC+YfTF28j/8rd7q6MBAi05lMN4KhLJjhN0s5YGIPB+kf1L20g==
+  dependencies:
+    "@noble/curves" "1.8.2"
+    "@noble/hashes" "1.7.2"
     "@scure/bip32" "1.6.2"
     "@scure/bip39" "1.5.4"
     abitype "1.0.8"

@@ -6,7 +6,7 @@
     "dependencies": {
         "@cartesi/viem": "^2.0.0-alpha.4",
         "@deroll/app": "2.0.0-alpha.0",
-        "@deroll/wallet": "https://github.com/brunomenezes/deroll/releases/download/%40deroll%2Fwallet%402.0.0-alpha.1/deroll-wallet-2.0.0-alpha.1.tgz",
+        "@deroll/wallet": "2.0.0-alpha.1",
         "viem": "^2"
     },
     "devDependencies": {
