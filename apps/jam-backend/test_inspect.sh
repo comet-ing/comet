@@ -2,7 +2,7 @@
 
 # Configuration
 ROLLUP_HOST="http://localhost:8080"
-DAPP_ADDRESS="0xd0d2e96abecd5f4e540f566c7b6a9cec08246591"
+DAPP_ADDRESS="0x3b352ef8dbd35fa90c0ef4ff5d7cb41008d49647"
 ITERATIONS=5  # Number of times each browser will run through all endpoints
 NUM_BROWSERS=4  # Number of simulated browsers
 
@@ -17,14 +17,16 @@ hex_to_string() {
 make_request() {
     local payload=$1
     local browser_id=$2
-    local url="${ROLLUP_HOST}/inspect/${DAPP_ADDRESS}/${payload}"
+    local url="${ROLLUP_HOST}/inspect/${DAPP_ADDRESS}"
     
-    echo "$(date '+%H:%M:%S') - Browser $browser_id - Making request: $url"
+    echo "$(date '+%H:%M:%S') - Browser $browser_id - Making request: $url with payload: $payload"
     
-    response=$(curl -s "$url" \
+    response=$(curl -X POST \
+        -s "$url" \
         -H "Accept: application/json, text/plain, */*" \
         -H "Accept-Language: en-US,en;q=0.9" \
-        -H "Connection: keep-alive")
+        -H "Connection: keep-alive" \
+        -d "$payload")
     
     if [ $? -eq 0 ]; then
         echo "Browser $browser_id - Raw Response:"
