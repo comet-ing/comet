@@ -54,6 +54,8 @@ yarn deploy:devnet:contract
 
 8. The environment is now set, proceed for app inputs. Some input actions with json examples are given below for illustration purposes as they need to be encoded and sent through contracts.
 
+You can use both the `./test_comet_jam.sh` and `test_inspect.sh` to automatically Create/Contribute/Mint a JAM. Also you can check the data by using making inspect calls to the node. Just update the **application address** inside the scripts in case it does not matches.
+
 ### Creating a Jam
 
 ```
