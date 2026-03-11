@@ -1,4 +1,3 @@
-import { getStartCometFrameMetadata } from "@jam/frames";
 import { Stack } from "@mantine/core";
 import { Metadata } from "next";
 import { FC } from "react";
@@ -22,10 +21,6 @@ export async function generateMetadata({
         if (jam.description) {
             metadata.description = jam.description;
         }
-        metadata.other = getStartCometFrameMetadata({
-            endpointBaseUrl: process.env.WEB_APP_BASE_URL,
-            cometId: params.id,
-        });
     } catch (error) {
         metadata.title = `Cometing - ${params.id}`;
     }

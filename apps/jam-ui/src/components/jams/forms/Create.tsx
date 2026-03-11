@@ -13,10 +13,7 @@ import { useForm } from "@mantine/form";
 import { FC, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
 import { stringToHex } from "viem";
-import { useAccount } from "wagmi";
-import { useApplicationAddress } from "../../../hooks/useApplicationAddress";
-import { useChainId } from "../../../hooks/useChainId";
-import useEspressoSequencer from "../../../hooks/useEspressoSequencer";
+import { useAddInput } from "../../../hooks/useAddInput";
 import { charactersLeft } from "../../../utils/functions";
 import { CenteredErrorMessage } from "../../CenteredErrorMessage";
 import { JAM_DESCRIPTION_CHAR_LIMIT, JAM_ENTRY_CHAR_LIMIT } from "./constants";
@@ -55,14 +52,7 @@ export const CreateJamForm: FC<Props> = ({ onSuccess }) => {
             ),
         }),
     });
-    const chainId = useChainId();
-    const { address } = useAccount();
-    const appAddress = useApplicationAddress();
-    const { status, error, submitTransaction, reset } = useEspressoSequencer({
-        account: address,
-        appAddress,
-        chainId,
-    });
+    const { status, error, submitTransaction, reset } = useAddInput();
 
     useEffect(() => {
         if (status === "success") {
