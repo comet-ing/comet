@@ -18,8 +18,7 @@ import nftContractAbi from "./SimpleERC1155ABI.js";
 
 // Create the application
 const app = createApp({
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    url: process.env.ROLLUP_HTTP_SERVER_URL || "http://127.0.0.1:5004",
+    baseUrl: process.env.ROLLUP_HTTP_SERVER_URL || "http://127.0.0.1:5004",
 });
 
 // Set smart contract addresses as per network
