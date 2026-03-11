@@ -13,7 +13,6 @@ import {
     Title,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { FC, useEffect, useMemo } from "react";
 import { formatEther } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
@@ -32,12 +31,11 @@ import { Voucher, VoucherType } from "./types";
 const isNotNullOrUndefined = (value: any) =>
     value !== null && value !== undefined;
 
-const refetchUserVouchers = (queryClient: QueryClient) =>
-    queryClient.invalidateQueries({ queryKey: voucherKeys.lists() });
-
-const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
+const ExecuteButton: FC<{ voucher: Voucher; onExecuted?: () => void }> = ({
+    voucher,
+    onExecuted,
+}) => {
     const appAddress = useApplicationAddress();
-    const queryClient = useQueryClient();
 
     const {
         data: wasOutputExecuted,
@@ -54,7 +52,7 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
 
     const prepare = useSimulateCartesiDAppExecuteOutput({
         args: [
-            voucher.payload,
+            voucher.rawData,
             {
                 ...voucher.proof,
                 outputIndex: BigInt(voucher.proof.outputIndex),
@@ -65,6 +63,7 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
             enabled:
                 !checkingOutputExecution &&
                 wasOutputExecuted === false &&
+                isNotNullOrUndefined(voucher.rawData) &&
                 isNotNullOrUndefined(voucher.proof) &&
                 isNotNullOrUndefined(voucher.proof.outputHashesSiblings) &&
                 isNotNullOrUndefined(voucher.proof.outputIndex),
@@ -84,9 +83,9 @@ const ExecuteButton: FC<{ voucher: Voucher }> = ({ voucher }) => {
                 autoClose: 3000,
             });
             refetch();
-            refetchUserVouchers(queryClient);
+            onExecuted?.();
         }
-    }, [wait.isSuccess, queryClient, refetch]);
+    }, [wait.isSuccess, refetch, onExecuted]);
 
     useEffect(() => {
         if (error) {
@@ -193,7 +192,10 @@ interface Props {
     userVoucher: UserVoucher;
 }
 
-const MintVoucher: FC<Props> = ({ userVoucher }) => {
+const MintVoucher: FC<Props & { onVoucherExecuted?: () => void }> = ({
+    userVoucher,
+    onVoucherExecuted,
+}) => {
     const { data, isLoading, error } = useFindJam(parseInt(userVoucher.value));
     const text = isLoading || error ? userVoucher.value : data?.name;
 
@@ -207,12 +209,18 @@ const MintVoucher: FC<Props> = ({ userVoucher }) => {
                     <Text size="xs">Mint</Text>
                 </Badge>
             </Stack>
-            <ExecuteButton voucher={userVoucher.voucher} />
+            <ExecuteButton
+                voucher={userVoucher.voucher}
+                onExecuted={onVoucherExecuted}
+            />
         </Group>
     );
 };
 
-const WithdrawVoucher: FC<Props> = ({ userVoucher }) => {
+const WithdrawVoucher: FC<Props & { onVoucherExecuted?: () => void }> = ({
+    userVoucher,
+    onVoucherExecuted,
+}) => {
     return (
         <Group justify="space-between" wrap="nowrap">
             <Stack gap={0} p="sm">
@@ -227,12 +235,18 @@ const WithdrawVoucher: FC<Props> = ({ userVoucher }) => {
                     <Text size="xs">Withdraw</Text>
                 </Badge>
             </Stack>
-            <ExecuteButton voucher={userVoucher.voucher} />
+            <ExecuteButton
+                voucher={userVoucher.voucher}
+                onExecuted={onVoucherExecuted}
+            />
         </Group>
     );
 };
 
-const Info: FC<{ userVoucher: UserVoucher }> = ({ userVoucher }) => {
+const Info: FC<{
+    userVoucher: UserVoucher;
+    onVoucherExecuted?: () => void;
+}> = ({ userVoucher, onVoucherExecuted }) => {
     return (
         <Box
             component={Stack}
@@ -242,9 +256,15 @@ const Info: FC<{ userVoucher: UserVoucher }> = ({ userVoucher }) => {
             miw={{ base: "100%", md: "210px" }}
         >
             {userVoucher.type === "MINT" ? (
-                <MintVoucher userVoucher={userVoucher} />
+                <MintVoucher
+                    userVoucher={userVoucher}
+                    onVoucherExecuted={onVoucherExecuted}
+                />
             ) : userVoucher.type === "WITHDRAW" ? (
-                <WithdrawVoucher userVoucher={userVoucher} />
+                <WithdrawVoucher
+                    userVoucher={userVoucher}
+                    onVoucherExecuted={onVoucherExecuted}
+                />
             ) : (
                 ""
             )}
@@ -253,13 +273,17 @@ const Info: FC<{ userVoucher: UserVoucher }> = ({ userVoucher }) => {
 };
 interface VoucherListProps {
     userVouchers: UserVoucher[];
+    onVoucherExecuted?: () => void;
 }
 
 type VoucherGroup = {
     [k in VoucherType]: UserVoucher[];
 };
 
-const VoucherList: FC<VoucherListProps> = ({ userVouchers }) => {
+const VoucherList: FC<VoucherListProps> = ({
+    userVouchers,
+    onVoucherExecuted,
+}) => {
     const voucherGroup = useMemo(() => {
         return userVouchers.reduce((prev, curr): VoucherGroup => {
             const list = prev[curr.type] ?? [];
@@ -286,6 +310,7 @@ const VoucherList: FC<VoucherListProps> = ({ userVouchers }) => {
                                 <Info
                                     key={`withdrawable-${idx}`}
                                     userVoucher={withdrawable}
+                                    onVoucherExecuted={onVoucherExecuted}
                                 />
                             ))}
                         </SimpleGrid>
@@ -305,6 +330,7 @@ const VoucherList: FC<VoucherListProps> = ({ userVouchers }) => {
                                 <Info
                                     key={`mintable-${idx}`}
                                     userVoucher={mintable}
+                                    onVoucherExecuted={onVoucherExecuted}
                                 />
                             ))}
                         </SimpleGrid>
@@ -317,7 +343,7 @@ const VoucherList: FC<VoucherListProps> = ({ userVouchers }) => {
 
 export const VouchersView: FC = () => {
     const { address, isConnected } = useAccount();
-    const { data, isLoading, error } = useGetUserVouchers(address);
+    const { data, isLoading, error, refetch } = useGetUserVouchers(address);
 
     if (error) console.log(error.message);
 
@@ -365,7 +391,7 @@ export const VouchersView: FC = () => {
 
     return (
         <Stack>
-            <VoucherList userVouchers={data} />
+            <VoucherList userVouchers={data} onVoucherExecuted={refetch} />
         </Stack>
     );
 };

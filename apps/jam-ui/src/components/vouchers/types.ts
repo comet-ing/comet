@@ -22,7 +22,10 @@ export interface Voucher {
     destination: Hex;
     executed?: boolean;
     index: number;
+    /** Decoded inner payload (e.g. mint calldata) for display and decoding. */
     payload: Hex;
+    /** Full output bytes as stored in the outputs Merkle tree. Required for executeOutput(). */
+    rawData: Hex;
     value: Hex;
     input: {
         id: string;

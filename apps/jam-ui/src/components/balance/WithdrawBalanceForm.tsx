@@ -13,9 +13,7 @@ import { FC, useEffect } from "react";
 import { FaEthereum } from "react-icons/fa";
 import { formatUnits, parseUnits } from "viem";
 import { useAccount } from "wagmi";
-import { useApplicationAddress } from "../../hooks/useApplicationAddress";
-import { useChainId } from "../../hooks/useChainId";
-import useEspressoSequencer from "../../hooks/useEspressoSequencer";
+import { useAddInput } from "../../hooks/useAddInput";
 import { CenteredErrorMessage } from "../CenteredErrorMessage";
 
 export interface Props {
@@ -51,15 +49,8 @@ export const WithdrawBalanceForm: FC<Props> = ({ onSuccess, balance }) => {
         },
     });
 
-    const appAddress = useApplicationAddress();
     const { amount } = form.getTransformedValues();
-    const chainId = useChainId();
-
-    const { status, error, submitTransaction, reset } = useEspressoSequencer({
-        chainId,
-        appAddress,
-        account,
-    });
+    const { status, error, submitTransaction, reset } = useAddInput();
 
     useEffect(() => {
         if (status === "success") {
