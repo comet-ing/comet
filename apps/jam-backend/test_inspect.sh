@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Configuration
-ROLLUP_HOST="http://localhost:8080"
-DAPP_ADDRESS="0x3b352ef8dbd35fa90c0ef4ff5d7cb41008d49647"
+ROLLUP_HOST="http://localhost:6751"
+DAPP_ADDRESS="0x4266d35892aac2b0601b82dbdabc93db38ebff2d"
 ITERATIONS=5  # Number of times each browser will run through all endpoints
 NUM_BROWSERS=4  # Number of simulated browsers
 
