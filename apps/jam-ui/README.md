@@ -17,11 +17,7 @@ First, follow the [README steps from the backend](../jam-backend/README.md). Onc
 yarn install
 ```
 
-2. Make sure the graphql service is running. It is necessary if checking on vouchers in the collections page.
-
-```bash
-cartesi rollups start --services graphql
-```
+2. Ensure the Cartesi node is running (e.g. `cartesi run`). The app uses [@cartesi/wagmi](https://cartesi.github.io/rollups-ts/wagmi) and [@cartesi/viem](https://cartesi.github.io/rollups-ts/) for L2 data: the collections page loads vouchers via `useOutputs` (JSON-RPC `cartesi_listOutputs`).
 
 3. Create a .env file inside the `/jam-ui` folder. You can copy the .env.template and modify the values as necessary.
 

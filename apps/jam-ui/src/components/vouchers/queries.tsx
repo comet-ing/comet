@@ -1,34 +1,16 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import request from "graphql-request";
+import { useOutputs } from "@cartesi/wagmi";
+import { useMemo } from "react";
 import { Address, zeroAddress } from "viem";
-import {
-    VouchersDocument,
-    VouchersQueryVariables,
-} from "../../generated/graphql/rollups/operations";
+import { useApplicationAddress } from "../../hooks/useApplicationAddress";
+import { outputToVoucher } from "../../utils/rollups.rpc";
 import { decodeVoucher, isVoucherOwnedByAccount } from "./functions";
 import { Voucher, VoucherType } from "./types";
-
-const rollupsHost = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT;
-const dappAddress = process.env.NEXT_PUBLIC_APP_ADDRESS;
-const graphqlURL = `${rollupsHost}/graphql/${dappAddress}`;
 
 export const voucherKeys = {
     base: ["vouchers"] as const,
     lists: () => [...voucherKeys.base, "list"] as const,
     list: (account: Address) => [...voucherKeys.lists(), account] as const,
-};
-
-const createError = (message: string) => Promise.reject(new Error(message));
-
-type Node = {
-    voucher: Voucher;
-};
-
-type VoucherQuery = {
-    vouchers: {
-        edges: Node[];
-    };
 };
 
 export type UserVoucher = {
@@ -38,36 +20,51 @@ export type UserVoucher = {
     receiver: Address;
 };
 
+const OUTPUTS_LIMIT = 200;
+
 /**
- *
- * @param address
- * @returns
+ * Fetch user vouchers via @cartesi/wagmi useOutputs (JSON-RPC cartesi_listOutputs),
+ * then filter by owner and map to UserVoucher[].
  */
-const fetchVouchers = async (address?: Address) => {
-    if (!address) return null;
-
-    const { vouchers } = await request<VoucherQuery, VouchersQueryVariables>(
-        graphqlURL,
-        VouchersDocument,
-    );
-
-    const edges = vouchers.edges ?? [];
-
-    const data: UserVoucher[] = edges
-        .filter((node) => isVoucherOwnedByAccount(node.voucher, address))
-        .map(({ voucher }) => {
-            const { value, receiver, type } = decodeVoucher(voucher);
-            return { voucher, value: value.toString(), receiver, type };
-        });
-
-    return data;
-};
-
-// HOOKS
-
 export const useGetUserVouchers = (address?: Address) => {
-    return useQuery({
-        queryKey: voucherKeys.list(address ?? zeroAddress),
-        queryFn: () => fetchVouchers(address),
+    const application = useApplicationAddress();
+    const { data, isLoading, error, refetch } = useOutputs({
+        application,
+        limit: OUTPUTS_LIMIT,
+        offset: 0,
     });
+
+    const userVouchers = useMemo(() => {
+        if (!address || !data?.data) return null;
+        const outputs = data.data;
+        const vouchers: Voucher[] = [];
+        for (const output of outputs) {
+            if (output.decodedData.type === "Voucher") {
+                vouchers.push(
+                    outputToVoucher({
+                        index: output.index,
+                        inputIndex: output.inputIndex,
+                        epochIndex: output.epochIndex,
+                        rawData: output.rawData,
+                        outputHashesSiblings: output.outputHashesSiblings,
+                        decodedData: output.decodedData,
+                        executionTransactionHash: output.executionTransactionHash,
+                    }),
+                );
+            }
+        }
+        return vouchers
+            .filter((v) => isVoucherOwnedByAccount(v, address))
+            .map((voucher) => {
+                const { value, receiver, type } = decodeVoucher(voucher);
+                return { voucher, value: value.toString(), receiver, type };
+            });
+    }, [address, data?.data]);
+
+    return {
+        data: userVouchers ?? undefined,
+        isLoading,
+        error,
+        refetch,
+    };
 };

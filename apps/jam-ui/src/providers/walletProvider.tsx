@@ -1,4 +1,5 @@
 "use client";
+import { CartesiProvider } from "@cartesi/wagmi";
 import { useMantineColorScheme } from "@mantine/core";
 import {
     AvatarComponent,
@@ -84,6 +85,10 @@ const [defaultCannonRpcUrl] = cannon.rpcUrls.default.http;
 const buildTransport = (defaultRpcUrl: string, nodeRpcUrl?: string) =>
     nodeRpcUrl ? http(nodeRpcUrl) : http(defaultRpcUrl);
 
+const rollupsRpcUrl = process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT
+    ? `${process.env.NEXT_PUBLIC_ROLLUPS_ENDPOINT.replace(/\/$/, "")}/rpc`
+    : "http://127.0.0.1:6751/rpc";
+
 const wagmiConfig = createConfig({
     ssr: true,
     connectors,
@@ -120,13 +125,15 @@ const WalletProvider = ({ children }: { children: ReactNode }) => {
     return (
         <WagmiProvider config={wagmiConfig}>
             <QueryClientProvider client={queryClient}>
-                <RainbowKitProvider
-                    appInfo={appInfo}
-                    theme={walletTheme}
-                    avatar={CustomAvatar}
-                >
-                    {children}
-                </RainbowKitProvider>
+                <CartesiProvider rpcUrl={rollupsRpcUrl}>
+                    <RainbowKitProvider
+                        appInfo={appInfo}
+                        theme={walletTheme}
+                        avatar={CustomAvatar}
+                    >
+                        {children}
+                    </RainbowKitProvider>
+                </CartesiProvider>
             </QueryClientProvider>
         </WagmiProvider>
     );

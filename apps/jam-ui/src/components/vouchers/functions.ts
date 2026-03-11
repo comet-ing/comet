@@ -7,7 +7,6 @@ import {
     parseAbi,
     zeroHash,
 } from "viem";
-import { outputsFactoryAbi } from "../../generated/wagmi-rollups";
 import { Proof, Voucher, VoucherType } from "./types";
 
 const erc1155Address = process.env.NEXT_PUBLIC_ERC1155_ADDRESS;
@@ -18,25 +17,29 @@ const withdrawEtherAbi = parseAbi([
     "function withdrawEther(address receiver, uint256 value)",
 ]);
 
-const decodeOutput = (payload: Hex) =>
-    decodeFunctionData({ abi: outputsFactoryAbi, data: payload });
-
+/**
+ * Backend stores raw contract calldata in voucher payload:
+ * - Mint: ERC1155 mint(receiver, jamId) calldata
+ * - Withdraw: 0x or withdrawEther(receiver, value) calldata
+ */
 const decodeMintVoucher = (voucher: Voucher) => {
-    const result = decodeOutput(voucher.payload);
-    const [_dest, _value, data] = result.args;
-    return decodeFunctionData({ abi: mintAbi, data: data as Hex });
+    return decodeFunctionData({ abi: mintAbi, data: voucher.payload });
 };
+
 const decodeEtherWithdrawVoucher = (voucher: Voucher) => {
-    const result = decodeOutput(voucher.payload);
-    const [dest, value, data] = result.args;
-
-    if (data === "0x")
+    if (!voucher.payload || voucher.payload === "0x" || voucher.payload.length <= 10) {
         return {
-            args: [dest, BigInt(value ?? "0")] as [Address, bigint],
-            functionName: "withdrawEther",
+            args: [getAddress(voucher.destination), BigInt(voucher.value)] as [
+                Address,
+                bigint,
+            ],
+            functionName: "withdrawEther" as const,
         };
-
-    return decodeFunctionData({ abi: withdrawEtherAbi, data: data as Hex });
+    }
+    return decodeFunctionData({
+        abi: withdrawEtherAbi,
+        data: voucher.payload,
+    });
 };
 
 export const dummyProof: Proof = {

@@ -1,5 +1,5 @@
-import CartesiAppContract from "@cartesi/rollups/out/Application.sol/Application.json" with { type: "json" };
-import OutputsContract from '@cartesi/rollups/out/Outputs.sol/Outputs.json' with { type: "json" };
+// Use dist path for compatibility with tsconfig moduleResolution when "exports" subpath is not resolved
+import { applicationAbi, outputsAbi } from "@cartesi/viem/dist/rollups.js";
 import { defineConfig } from "@wagmi/cli";
 import { react } from "@wagmi/cli/plugins";
 import { Abi, Address } from "viem";
@@ -10,17 +10,17 @@ export default defineConfig({
     contracts: [
         {
             name: "CartesiDApp",
-            abi: CartesiAppContract.abi as Abi,
+            abi: applicationAbi as Abi,
         },
         {
             name: "OutputsFactory",
-            abi: OutputsContract.abi as Abi
-        }, 
+            abi: outputsAbi as Abi,
+        },
         {
             name: EtherPortalDeployment.contractName,
             abi: EtherPortalDeployment.abi as Abi,
             address: EtherPortalDeployment.address as Address
-        }        
+        }
     ],
     plugins: [        
         react(),
