@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Set common variables
-INPUT_BOX_ADDRESS="0xB6b39Fb3dD926A9e3FBc7A129540eEbeA3016a6c"
-APPLICATION_ADDRESS="0x3b352ef8dbd35fa90c0ef4ff5d7cb41008d49647"
-ETHER_PORTAL_ADDRESS="0xd31aD6613bDaA139E7D12B2428C0Dd00fdBF8aDa"
+INPUT_BOX_ADDRESS="0x1b51e2992A2755Ba4D6F7094032DF91991a0Cfac"
+APPLICATION_ADDRESS="0x1f34ece43b892bb1d102e93b135db6f8941f584c"
+ETHER_PORTAL_ADDRESS="0xA632c5c05812c6a6149B7af5C56117d1D2603828"
 MNEMONIC="test test test test test test test test test test test junk"
-RPC_URL="http://localhost:8080/anvil"
+RPC_URL="http://localhost:6751/anvil"
 
 # Function to send input using cast
 send_input() {
