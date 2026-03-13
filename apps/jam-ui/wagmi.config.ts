@@ -1,5 +1,4 @@
-// Use dist path for compatibility with tsconfig moduleResolution when "exports" subpath is not resolved
-import { applicationAbi, outputsAbi } from "@cartesi/viem/dist/rollups.js";
+import { applicationAbi, outputsAbi } from "@cartesi/viem/abi";
 import { defineConfig } from "@wagmi/cli";
 import { react } from "@wagmi/cli/plugins";
 import { Abi, Address } from "viem";
@@ -9,7 +8,7 @@ export default defineConfig({
     out: "src/generated/wagmi-rollups/index.ts",
     contracts: [
         {
-            name: "CartesiDApp",
+            name: "CartesiApplication",
             abi: applicationAbi as Abi,
         },
         {

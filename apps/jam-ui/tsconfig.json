@@ -6,7 +6,8 @@
                 "name": "next"
             }
         ],
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "moduleResolution": "bundler"
     },
     "include": [
         "src",
@@ -18,5 +19,5 @@
         ".next/types/**/*.ts",
         "postcss.config.js"
     ],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "wagmi.config.ts"]
 }

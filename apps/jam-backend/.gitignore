@@ -9,3 +9,4 @@ lcov.info
 remappings.txt
 deroll-packages/
 scripts/copy-deroll.sh
+*.tar.gz

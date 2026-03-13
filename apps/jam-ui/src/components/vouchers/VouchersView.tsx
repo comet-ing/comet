@@ -17,15 +17,15 @@ import { FC, useEffect, useMemo } from "react";
 import { formatEther } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
-    useReadCartesiDAppWasOutputExecuted,
-    useSimulateCartesiDAppExecuteOutput,
-    useWriteCartesiDAppExecuteOutput,
+    useReadCartesiApplicationWasOutputExecuted,
+    useSimulateCartesiApplicationExecuteOutput,
+    useWriteCartesiApplicationExecuteOutput,
 } from "../../generated/wagmi-rollups";
 import { useApplicationAddress } from "../../hooks/useApplicationAddress";
 import { CenteredLoaderBars } from "../CenteredLoaderBars";
 import { CometAlert } from "../CometAlert";
 import { useFindJam } from "../jams/queries";
-import { useGetUserVouchers, UserVoucher, voucherKeys } from "./queries";
+import { useGetUserVouchers, UserVoucher } from "./queries";
 import { Voucher, VoucherType } from "./types";
 
 const isNotNullOrUndefined = (value: any) =>
@@ -42,7 +42,7 @@ const ExecuteButton: FC<{ voucher: Voucher; onExecuted?: () => void }> = ({
         isFetching: checkingOutputExecution,
         error,
         refetch,
-    } = useReadCartesiDAppWasOutputExecuted({
+    } = useReadCartesiApplicationWasOutputExecuted({
         args: [BigInt(voucher.index)],
         address: appAddress,
         query: {
@@ -50,7 +50,7 @@ const ExecuteButton: FC<{ voucher: Voucher; onExecuted?: () => void }> = ({
         },
     });
 
-    const prepare = useSimulateCartesiDAppExecuteOutput({
+    const prepare = useSimulateCartesiApplicationExecuteOutput({
         args: [
             voucher.rawData,
             {
@@ -70,7 +70,7 @@ const ExecuteButton: FC<{ voucher: Voucher; onExecuted?: () => void }> = ({
         },
     });
 
-    const execute = useWriteCartesiDAppExecuteOutput();
+    const execute = useWriteCartesiApplicationExecuteOutput();
     const wait = useWaitForTransactionReceipt({
         hash: execute.data,
     });

@@ -11,7 +11,7 @@ import {
     zeroAddress,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { cannon, sepolia } from "viem/chains";
+import { anvil, sepolia } from "viem/chains";
 import { writeDeploymentInfo } from "./utils.mjs";
 
 const DEVNET_DEFAULT_PK =
@@ -19,12 +19,12 @@ const DEVNET_DEFAULT_PK =
 
 const currentDir = import.meta.dirname;
 const PRIVATE_KEY = process.env.PRIVATE_KEY ?? DEVNET_DEFAULT_PK;
-const CHAIN_ID = process.env.CHAIN_ID ?? "13370";
+const CHAIN_ID = process.env.CHAIN_ID ?? "31337";
 const RPC_URL = process.env.PROVIDER_RPC_URL ?? "http://127.0.0.1:8080/anvil";
 const APP_ADDRESS = process.env.APP_ADDRESS ?? zeroAddress;
 
-const chains = [cannon, sepolia];
-const chain = chains.find((chain) => chain.id === parseInt(CHAIN_ID)) ?? cannon;
+const chains = [sepolia, anvil];
+const chain = chains.find((chain) => chain.id === parseInt(CHAIN_ID)) ?? anvil;
 const config = { chain, transport: http(RPC_URL) };
 const publicClient = createPublicClient(config);
 const walletClient = createWalletClient(config);
