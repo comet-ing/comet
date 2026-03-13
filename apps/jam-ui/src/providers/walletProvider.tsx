@@ -22,13 +22,15 @@ import Image from "next/image";
 import { ReactNode } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { createConfig, http, WagmiProvider } from "wagmi";
+import { baseSepolia } from "viem/chains";
 import { cannon, foundry, sepolia } from "wagmi/chains";
 
-// select chain based on env var
+// select chain based on env var (prod: Base Sepolia 84532, dev: foundry/sepolia/cannon)
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "13370");
 const nodeRpcUrl = process.env.NEXT_PUBLIC_NODE_RPC_URL;
 const chain =
-    [foundry, sepolia, cannon].find((c) => c.id == chainId) || foundry;
+    [foundry, sepolia, cannon, baseSepolia].find((c) => c.id == chainId) ||
+    foundry;
 
 const projectId = "37a6d6f11d78a12ca814a377a53b5b55";
 
@@ -81,6 +83,7 @@ const CustomAvatar: AvatarComponent = ({ address, ensImage, size }) => {
 const [defaultFoundryRpcUrl] = foundry.rpcUrls.default.http;
 const [defaultSepoliaRpcUrl] = sepolia.rpcUrls.default.http;
 const [defaultCannonRpcUrl] = cannon.rpcUrls.default.http;
+const [defaultBaseSepoliaRpcUrl] = baseSepolia.rpcUrls.default.http;
 
 const buildTransport = (defaultRpcUrl: string, nodeRpcUrl?: string) =>
     nodeRpcUrl ? http(nodeRpcUrl) : http(defaultRpcUrl);
@@ -98,6 +101,7 @@ const wagmiConfig = createConfig({
         [foundry.id]: buildTransport(defaultFoundryRpcUrl, nodeRpcUrl),
         [sepolia.id]: buildTransport(defaultSepoliaRpcUrl, nodeRpcUrl),
         [cannon.id]: buildTransport(defaultCannonRpcUrl, nodeRpcUrl),
+        [baseSepolia.id]: buildTransport(defaultBaseSepoliaRpcUrl, nodeRpcUrl),
     },
 });
 
