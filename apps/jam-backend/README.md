@@ -8,7 +8,7 @@ The application entrypoint is the `src/index.js` file. It is bundled with [esbui
 > [!IMPORTANT]  
 > Required to succeed
 >
-> - @cartesi/cli@2.0.0-alpha.9 or above
+> - @cartesi/cli@2.0.0-alpha.29 or above
 > - Docker
 > - Foundry [reference to install](https://book.getfoundry.sh/getting-started/installation)
 
@@ -18,41 +18,35 @@ The application entrypoint is the `src/index.js` file. It is bundled with [esbui
 yarn install
 ```
 
-2. Start the rollups environment
-
-```
-cartesi rollups start
-```
-
-3. Run cartesi build
+2. Run cartesi build
 
 ```
 cartesi build
 ```
 
-4. Deploy the DApp (for devnet the default options are fine)
+3. Run the Application (for devnet the default options are fine)
 
 ```
-cartesi rollups deploy
+cartesi run
 ```
 
-5. Check on the application address provided in the terminal by the previous step and fill the [.env.devnet](./env.devnet) file with the appropriate information.
+4. Check on the application address provided in the terminal by the previous step and fill the [.env.devnet](./env.devnet) file with the appropriate information.
 
-6. Build the contract assets we use (ERC1155 contract).
+5. Build the contract assets we use (ERC1155 contract).
 
 ```
 yarn build:contracts
 ```
 
-7. deploy the ERC1155 contract we use and notify the deployed DApp about it. (Check the docker logs in rollups-node)
+6. deploy the ERC1155 contract we use and notify the deployed DApp about it. (Check the docker logs in rollups-node)
 
 ```
 yarn deploy:devnet:contract
 ```
 
-7.1 You can use the address printed for ERC1155 as it is necessary to include the [UI](../jam-ui/) environment variables. In case you clean-up your screen a deployment information is saved under `contracts/deployments`.
+6.1 You can use the address printed for ERC1155 as it is necessary to include the [UI](../jam-ui/) environment variables. In case you clean-up your screen a deployment information is saved under `contracts/deployments`.
 
-8. The environment is now set, proceed for app inputs. Some input actions with json examples are given below for illustration purposes as they need to be encoded and sent through contracts.
+7. The environment is now set, proceed for app inputs. Some input actions with json examples are given below for illustration purposes as they need to be encoded and sent through contracts.
 
 You can use both the `./test_comet_jam.sh` and `test_inspect.sh` to automatically Create/Contribute/Mint a JAM. Also you can check the data by using making inspect calls to the node. Just update the **application address** inside the scripts in case it does not matches.
 
@@ -84,12 +78,6 @@ Accepts ether amount in wei format
 
 ```
 {"action":"eth.withdraw", "amount":"2000000000000000000"}
-```
-
-### Inpect eth balance inside the dapp
-
-```
-http://localhost:8080/inspect/balance/<input-address-here>
 ```
 
 ### Using a Rest Client API (e.g Thunder Client)

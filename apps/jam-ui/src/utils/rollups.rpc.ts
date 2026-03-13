@@ -1,6 +1,9 @@
-import { createCartesiPublicClient } from "@cartesi/viem";
-import { http } from "viem";
+import {
+    type CartesiPublicClient,
+    createCartesiPublicClient,
+} from "@cartesi/viem";
 import type { Address } from "viem";
+import { http } from "viem";
 import type { Voucher } from "../components/vouchers/types";
 
 const getRpcUrl = () => {
@@ -13,13 +16,13 @@ const getRpcUrl = () => {
     return url.endsWith("/rpc") ? url : `${url.replace(/\/$/, "")}/rpc`;
 };
 
-let client: ReturnType<typeof createCartesiPublicClient> | null = null;
+let client: CartesiPublicClient | null = null;
 
 /**
  * Get a Cartesi L2 public client for JSON-RPC (listOutputs, getOutput, etc.).
  * Uses NEXT_PUBLIC_ROLLUPS_ENDPOINT for the base URL and appends /rpc.
  */
-export function getRollupsPublicClient() {
+export function getRollupsPublicClient(): CartesiPublicClient {
     if (!client) {
         client = createCartesiPublicClient({
             transport: http(getRpcUrl()),
