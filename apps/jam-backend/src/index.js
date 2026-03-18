@@ -343,6 +343,12 @@ app.addInspectHandler(async ({ payload }) => {
                     payload: stringToHex(JSON.stringify(allJamStats)),
                 });
                 break;
+            case "nextjamid":
+                const nextJamId = Jam.getNextJamId();
+                await app.createReport({
+                    payload: stringToHex(JSON.stringify({ nextJamId })),
+                });
+                break;
             default:
                 throw new Error("Invalid inspect action");
         }

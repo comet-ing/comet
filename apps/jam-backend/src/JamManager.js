@@ -220,4 +220,8 @@ export default class Jam {
 
         return filteredJams.map(Jam.#mapToJamLite);
     };
+
+    static getNextJamId = () => {
+        return Jam.jamIDCounter;
+    };
 }

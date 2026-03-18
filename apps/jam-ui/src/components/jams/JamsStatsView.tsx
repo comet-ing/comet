@@ -9,6 +9,7 @@ import {
     getThemeColor,
     Group,
     NumberFormatter,
+    Pagination,
     Table,
     Text,
     Title,
@@ -17,13 +18,15 @@ import {
 } from "@mantine/core";
 
 import Link from "next/link";
-import { FC, useMemo } from "react";
+import { FC, useMemo, useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { theme } from "../../providers/theme";
 import { CenteredLoaderBars } from "../CenteredLoaderBars";
 import { CometAlert } from "../CometAlert";
 import { useListJamsStats } from "./queries";
 import { JamStats } from "./types";
+
+const LEADERBOARD_PAGE_SIZE = 25;
 
 const getBackgroundColourByRank = (rank: number) => {
     switch (rank) {
@@ -49,7 +52,7 @@ const getTextColourByRank = (rank: number) => {
     }
 };
 
-const Leaderboard: FC<{ jamStats: JamStats[] }> = ({ jamStats }) => {
+const Leaderboard: FC<{ jamStats: JamStats[]; rankOffset?: number }> = ({ jamStats, rankOffset = 0 }) => {
     const theme = useMantineTheme();
     const shadowConfig = {
         boxShadow: `0px 8px 5px -5px ${getThemeColor("grey", theme)}`,
@@ -57,26 +60,28 @@ const Leaderboard: FC<{ jamStats: JamStats[] }> = ({ jamStats }) => {
 
     const rows = useMemo(
         () =>
-            jamStats.map((stats, idx) => (
+            jamStats.map((stats, idx) => {
+                const globalRank = rankOffset + idx;
+                return (
                 <Table.Tr
                     key={idx}
                     style={{
                         ...shadowConfig,
                         textAlign: "center",
                     }}
-                    bg={getBackgroundColourByRank(idx)}
+                    bg={getBackgroundColourByRank(globalRank)}
                 >
                     <Table.Td>
                         <Text
-                            c={getTextColourByRank(idx)}
+                            c={getTextColourByRank(globalRank)}
                             size="1.5rem"
                             fw="500"
                         >
-                            {idx + 1}
+                            {globalRank + 1}
                         </Text>
                     </Table.Td>
                     <Table.Td>
-                        <Text fw="bold" c={getTextColourByRank(idx)}>
+                        <Text fw="bold" c={getTextColourByRank(globalRank)}>
                             {stats.name}
                         </Text>
                     </Table.Td>
@@ -84,7 +89,7 @@ const Leaderboard: FC<{ jamStats: JamStats[] }> = ({ jamStats }) => {
                         <Text
                             fw="bolder"
                             size="xl"
-                            c={getTextColourByRank(idx)}
+                            c={getTextColourByRank(globalRank)}
                         >
                             {stats.totalContributors}
                         </Text>
@@ -93,7 +98,7 @@ const Leaderboard: FC<{ jamStats: JamStats[] }> = ({ jamStats }) => {
                         <Text
                             fw="bolder"
                             size="xl"
-                            c={getTextColourByRank(idx)}
+                            c={getTextColourByRank(globalRank)}
                         >
                             {stats.numTotalMints}
                         </Text>{" "}
@@ -102,7 +107,7 @@ const Leaderboard: FC<{ jamStats: JamStats[] }> = ({ jamStats }) => {
                         <Text
                             fw="bolder"
                             size="xl"
-                            c={getTextColourByRank(idx)}
+                            c={getTextColourByRank(globalRank)}
                         >
                             <NumberFormatter
                                 value={stats.totalMintAmount}
@@ -115,7 +120,7 @@ const Leaderboard: FC<{ jamStats: JamStats[] }> = ({ jamStats }) => {
                         <Text
                             fw="bolder"
                             size="xl"
-                            c={getTextColourByRank(idx)}
+                            c={getTextColourByRank(globalRank)}
                         >
                             <NumberFormatter
                                 value={stats.score}
@@ -124,8 +129,9 @@ const Leaderboard: FC<{ jamStats: JamStats[] }> = ({ jamStats }) => {
                         </Text>
                     </Table.Td>
                 </Table.Tr>
-            )),
-        [jamStats],
+                );
+            }),
+        [jamStats, rankOffset],
     );
 
     return (
@@ -164,7 +170,7 @@ const Leaderboard: FC<{ jamStats: JamStats[] }> = ({ jamStats }) => {
 };
 
 const sortByScore = (stats: JamStats[]) =>
-    stats.sort((a, b) => {
+    [...stats].sort((a, b) => {
         const scoreA = Number(a.score);
         const scoreB = Number(b.score);
         return scoreA < scoreB ? 1 : scoreA > scoreB ? -1 : 0;
@@ -172,6 +178,7 @@ const sortByScore = (stats: JamStats[]) =>
 
 export const JamsStatsView: FC = () => {
     const { data, isLoading, error } = useListJamsStats();
+    const [page, setPage] = useState(1);
 
     if (error) console.log(error.message);
 
@@ -203,13 +210,29 @@ export const JamsStatsView: FC = () => {
             </Center>
         );
 
+    const sortedStats = sortByScore(data);
+    const total = sortedStats.length;
+    const totalPages = Math.ceil(total / LEADERBOARD_PAGE_SIZE);
+    const pageStart = (page - 1) * LEADERBOARD_PAGE_SIZE;
+    const statsOnPage = sortedStats.slice(pageStart, pageStart + LEADERBOARD_PAGE_SIZE);
+
     return (
         <Container
             fluid
             w={{ base: "95%", sm: "89%", lg: "75%" }}
             px={{ base: 3, sm: 8 }}
         >
-            <Leaderboard jamStats={sortByScore(data)} />
+            <Leaderboard jamStats={statsOnPage} rankOffset={pageStart} />
+            {totalPages > 1 && (
+                <Center mt="lg">
+                    <Pagination
+                        total={totalPages}
+                        value={page}
+                        onChange={setPage}
+                        color="haiti"
+                    />
+                </Center>
+            )}
         </Container>
     );
 };

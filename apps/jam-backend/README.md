@@ -113,3 +113,7 @@ jams/<input-jamID-here>
 // Get all jam statistics
 
 > body -> jamstats
+
+// Get the next jam ID (useful for knowing the current jam count)
+
+> body -> nextjamid
