@@ -117,3 +117,7 @@ jams/<input-jamID-here>
 // Get the next jam ID (useful for knowing the current jam count)
 
 > body -> nextjamid
+
+// Get the currently configured NFT (ERC1155) contract address
+
+> body -> nftaddress

@@ -343,6 +343,14 @@ app.addInspectHandler(async ({ payload }) => {
                     payload: stringToHex(JSON.stringify(allJamStats)),
                 });
                 break;
+            case "nftaddress":
+                const nftAddress = nft_erc1155_address
+                    ? nft_erc1155_address
+                    : null;
+                await app.createReport({
+                    payload: stringToHex(JSON.stringify({ nftAddress })),
+                });
+                break;
             case "nextjamid":
                 const nextJamId = Jam.getNextJamId();
                 await app.createReport({
