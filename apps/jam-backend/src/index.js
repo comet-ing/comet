@@ -39,25 +39,25 @@ var nft_erc1155_address = "";
 // Instantiate wallet for the rollup accounts
 const wallet = createWallet();
 
+const errorMessage = (error) =>
+    error instanceof Error ? error.message : String(error);
+
 // Main advance request handler
 app.addAdvanceHandler(async ({ metadata, payload }) => {
     try {
-        console.log("Advance Request(2)");
-        console.log(`raw-payload: ${payload}`);
         const sender = getAddress(metadata.msg_sender);
         // TODO: add a mint condition when user already has in-app balance i.e. minting via L2 msg.
         // ether deposit handling
         if (sender === ether_portal_address) {
-            console.log("Ether deposit request");
+            console.log("Received ether deposit request.");
             try {
                 // Use the wallet's handler to process the deposit
                 await wallet.handler({ metadata, payload });
-                console.log(
-                    "Wallet after deposit: ",
-                    wallet.getWallet(getAddress(slice(payload, 0, 20))),
-                );
+                console.log("Ether deposit processed successfully.");
             } catch (error) {
-                console.log("Error in eth deposit", error);
+                console.error(
+                    `Ether deposit failed: ${errorMessage(error)}`,
+                );
                 return "reject";
             }
 
@@ -72,13 +72,12 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                 // ether deposit without execution payload
                 return "accept";
             }
-            console.debug("input data is", input_data);
             let etherDepositExecJSON;
             try {
                 etherDepositExecJSON = JSON.parse(hexToString(input_data[2]));
             } catch (error) {
                 console.warn(
-                    "Invalid JSON in deposit payload. Treating as simple deposit.",
+                    "Invalid ether deposit execution payload; treating as simple deposit.",
                 );
                 return "accept";
             }
@@ -88,11 +87,9 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                 nft_erc1155_address
             ) {
                 console.log(
-                    "Processing mint request for jam : #",
-                    etherDepositExecJSON.jamID,
+                    `Processing mint request for jam ${etherDepositExecJSON.jamID}.`,
                 );
                 const jamToMint = Jam.getJamByID(etherDepositExecJSON.jamID);
-                console.log("Jam fetched: ", jamToMint);
                 if (jamToMint === null) {
                     await app.createReport({
                         payload: stringToHex("Jam not found with given ID"),
@@ -101,17 +98,19 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                 }
                 const minterEthBalance = wallet.etherBalanceOf(input_data[0]);
                 const jamMintPrice = parseEther(String(jamToMint.mintPrice));
-                console.log("Eth balance : ", minterEthBalance);
-                console.log("Mint Price : ", jamToMint.mintPrice);
 
                 if (minterEthBalance >= jamMintPrice) {
-                    console.log("Eth balance is sufficient to mint.");
+                    console.log(
+                        `Jam ${etherDepositExecJSON.jamID} mint approved.`,
+                    );
                     const callData = encodeFunctionData({
                         abi: nftContractAbi,
                         functionName: "mint",
                         args: [input_data[0], etherDepositExecJSON.jamID],
                     });
-                    console.log("Creating voucher for minting: ", callData);
+                    console.log(
+                        `Creating mint voucher for jam ${etherDepositExecJSON.jamID}.`,
+                    );
                     try {
                         await app.createVoucher({
                             destination: nft_erc1155_address,
@@ -120,8 +119,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                         });
                     } catch (error) {
                         console.error(
-                            "Error creating voucher for minting:",
-                            error,
+                            `Mint voucher creation failed for jam ${etherDepositExecJSON.jamID}: ${errorMessage(error)}`,
                         );
                         await app.createReport({
                             payload: stringToHex(
@@ -139,15 +137,16 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                         jamToMint.handleMintStats(jamMintPrice);
                     } catch (error) {
                         console.error(
-                            "Error updating creator balance or mint stats:",
-                            error,
+                            `Mint settlement failed for jam ${etherDepositExecJSON.jamID}: ${errorMessage(error)}`,
                         );
                         await app.createReport({
                             payload: stringToHex(`Error: ${error.message}`),
                         });
                     }
                 } else {
-                    console.log("Insufficient balance to mint. Deposit ether.");
+                    console.log(
+                        `Insufficient balance to mint jam ${etherDepositExecJSON.jamID}.`,
+                    );
                     await app.createReport({
                         payload: stringToHex(
                             "Insufficient balance to mint. Deposit ether.",
@@ -158,7 +157,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                 return "accept";
             } else {
                 console.warn(
-                    "Either action for mint or NFT address not set. Treating as simple deposit.",
+                    "Ether deposit did not include a valid mint request; treating as simple deposit.",
                 );
                 return "accept";
             }
@@ -167,11 +166,13 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
         // Relay dApp address
         // TODO: Check the removal of this logic. There is no address_relay_contract anymore
         if (sender === dapp_address_relay_contract) {
-            console.log("Dapp Address relay request");
+            console.log("Received dapp address relay request.");
             try {
                 await wallet.handler({ metadata, payload });
             } catch (error) {
-                console.log("Error in relaying dapp address", error);
+                console.error(
+                    `Dapp address relay failed: ${errorMessage(error)}`,
+                );
                 return "reject";
             }
             return "accept";
@@ -179,18 +180,14 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 
         // Jam Action handling
         var input = hexToString(payload);
-        console.log("Payload(hex-to-string) : ", input);
         input = JSON.parse(input);
         const timestamp = metadata.block_timestamp ?? Date.now();
-
-        console.log(`####TIMESTAMP: ${timestamp}`);
         try {
             switch (input.action) {
                 case "jam.setNFTAddress":
                     nft_erc1155_address = getAddress(input.address);
                     console.log(
-                        "NFT Contract address set as: ",
-                        nft_erc1155_address,
+                        "NFT contract address updated.",
                     );
                     break;
                 case "jam.create":
@@ -203,7 +200,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                         sender,
                         timestamp,
                     );
-                    console.log("New Jam created: ", newJam);
+                    console.log(`Jam with ID ${newJam.id} was created.`);
                     break;
                 case "jam.append":
                     try {
@@ -220,9 +217,13 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                             input.entry,
                             timestamp,
                         );
-                        console.log("Appended to JamID: ", input.jamID);
+                        console.log(
+                            `Entry appended to jam ${input.jamID}.`,
+                        );
                     } catch (error) {
-                        console.error("Error in jam.append:", error);
+                        console.error(
+                            `Appending to jam ${input.jamID} failed: ${errorMessage(error)}`,
+                        );
                         await app.createReport({
                             payload: stringToHex(`Error: ${error.message}`),
                         });
@@ -230,14 +231,13 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                     }
                     break;
                 case "eth.withdraw":
-                    console.log("Withdraw ether");
+                    console.log("Received ether withdrawal request.");
                     const amountToWithdraw = BigInt(input.amount);
                     try {
                         const voucher = wallet.withdrawEther(
                             sender,
                             amountToWithdraw,
                         );
-                        console.log("Voucher for eth withdrawal: ", voucher);
                         const paddedValue = padHex(voucher.value, { size: 32 });
 
                         await app.createVoucher({
@@ -245,8 +245,11 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                             value: paddedValue,
                             payload: voucher.payload,
                         });
+                        console.log("Ether withdrawal voucher created.");
                     } catch (error) {
-                        console.error("Error withdrawing ether:", error);
+                        console.error(
+                            `Ether withdrawal failed: ${errorMessage(error)}`,
+                        );
                         await app.createReport({
                             payload: stringToHex(
                                 `Error withdrawing ether: ${error.message}`,
@@ -259,7 +262,9 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
                     throw new Error("Invalid input action");
             }
         } catch (error) {
-            console.error("Error processing jam action:", error);
+            console.error(
+                `Advance action processing failed: ${errorMessage(error)}`,
+            );
             await app.createReport({
                 payload: stringToHex(
                     `Error processing jam action: ${error.message}`,
@@ -270,7 +275,7 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 
         return "accept";
     } catch (error) {
-        console.error("Error in advance handler:", error);
+        console.error(`Advance handler failed: ${errorMessage(error)}`);
         await app.createReport({
             payload: stringToHex(`Error: ${error.message}`),
         });
@@ -280,7 +285,6 @@ app.addAdvanceHandler(async ({ metadata, payload }) => {
 
 app.addInspectHandler(async ({ payload }) => {
     try {
-        console.log("Inspect Request");
         const decodedPayload = hexToString(payload);
         const payloadArr = decodedPayload.split("/");
 
@@ -292,7 +296,9 @@ app.addInspectHandler(async ({ payload }) => {
                         payload: stringToHex(JSON.stringify(lightJams)),
                     });
                 } catch (error) {
-                    console.error("Error stringifying lightJams:", error);
+                    console.error(
+                        `Failed to serialize all jams response: ${errorMessage(error)}`,
+                    );
                     await app.createReport({
                         payload: stringToHex(`Error: ${error.message}`),
                     });
@@ -332,7 +338,7 @@ app.addInspectHandler(async ({ payload }) => {
             case "balance":
                 const balanceUserAddress = getAddress(payloadArr[1]);
                 const eth_balance = wallet.etherBalanceOf(balanceUserAddress);
-                console.log("eth balance:", eth_balance);
+                console.log("Returning ether balance.");
                 await app.createReport({
                     payload: stringToHex(String(eth_balance)),
                 });
@@ -363,7 +369,7 @@ app.addInspectHandler(async ({ payload }) => {
 
         return "accept";
     } catch (error) {
-        console.error("Error in inspect handler:", error);
+        console.error(`Inspect handler failed: ${errorMessage(error)}`);
         await app.createReport({
             payload: stringToHex(`Error: ${error.message}`),
         });
@@ -373,6 +379,6 @@ app.addInspectHandler(async ({ payload }) => {
 
 // Start the application
 app.start().catch((e) => {
-    console.error(e);
+    console.error(`Application startup failed: ${errorMessage(e)}`);
     process.exit(1);
 });

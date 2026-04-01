@@ -37,7 +37,7 @@ export default class Jam {
     }
 
     static showAllJams = () => {
-        console.log(Jam.allJams);
+        console.log(`Total jams: ${Jam.allJams.length}.`);
     };
 
     appendToJam = (address, text, timestamp) => {
@@ -110,7 +110,7 @@ export default class Jam {
         const totalParticipants = jam.submittedAddresses.size;
         const amountPerParticipant =
             parseEther(String(jam.mintPrice)) / BigInt(totalParticipants);
-        console.debug("Amount per participant: ", amountPerParticipant);
+        console.log(`Distributing mint proceeds for jam ${jamID}.`);
         for (const toAddress of jam.submittedAddresses) {
             try {
                 await wallet.transferEther(
@@ -119,10 +119,12 @@ export default class Jam {
                     amountPerParticipant,
                 );
             } catch (error) {
-                console.error(`Failed to transfer to ${toAddress}:`, error);
+                console.error(
+                    `Failed to transfer mint proceeds for jam ${jamID}: ${error.message}`,
+                );
             }
         }
-        console.debug("Balance updated successfully");
+        console.log(`Mint proceeds distributed for jam ${jamID}.`);
     };
 
     handleMintStats(mintAmount) {
@@ -142,7 +144,6 @@ export default class Jam {
 
     static updateJamScore = (jam) => {
         const currentJamStat = Jam.jamStats.get(jam.id);
-        console.log("JamStat fetched to update score: ", currentJamStat);
         const numCollaborators = jam.submittedAddresses.size;
         const numTotalMints = currentJamStat ? currentJamStat.numTotalMints : 0;
         const totalMintAmount = currentJamStat
@@ -171,6 +172,7 @@ export default class Jam {
         // update jam stats
         currentJamStat.score = Math.min(overallScore, 100).toFixed(2);
         Jam.jamStats.set(jam.id, currentJamStat);
+        console.log(`Jam ${jam.id} score updated.`);
     };
 
     static getJamStatsById = (jamID) => {
